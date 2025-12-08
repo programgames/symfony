@@ -3,24 +3,25 @@
 namespace App\Controller;
 
 use Doctrine\DBAL\Connection;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class HealthController
+final class HealthController extends AbstractController
 {
     public function __construct(
-        private Connection $connection
+        private readonly Connection $connection
     ) {}
 
-    #[Route('/health', name: 'health', methods: ['GET'])]
-    public function health(): JsonResponse
+    #[Route('/health', name: 'app_health', methods: ['GET'])]
+    public function index(): JsonResponse
     {
         try {
             // Check database
             $this->connection->executeQuery('SELECT 1');
 
-            return new JsonResponse([
+            return $this->json([
                 'status' => 'healthy',
                 'timestamp' => time(),
                 'services' => [
@@ -28,7 +29,7 @@ class HealthController
                 ]
             ]);
         } catch (\Exception $e) {
-            return new JsonResponse([
+            return $this->json([
                 'status' => 'unhealthy',
                 'error' => $e->getMessage()
             ], Response::HTTP_SERVICE_UNAVAILABLE);
