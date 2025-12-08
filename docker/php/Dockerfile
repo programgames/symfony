@@ -23,6 +23,10 @@ RUN docker-php-ext-configure gd --with-jpeg --with-freetype
 RUN docker-php-ext-install \
     pdo pdo_pgsql zip xsl gd intl opcache exif mbstring
 
+# Copier les configurations PHP pour la production
+COPY docker/php/conf.d/opcache.prod.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY docker/php/conf.d/php.prod.ini /usr/local/etc/php/conf.d/php.ini
+
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Exposer le port 9000 (par défaut de php-fpm)

@@ -2,12 +2,17 @@
 /.env.local
 /.env.local.php
 /.env.*.local
+/.env.prod.local
 /.env.docker.prod
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+
+###> Backups ###
+/backups/
+###< Backups ###
 
 ###> phpunit/phpunit ###
 /phpunit.xml
