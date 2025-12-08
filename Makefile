@@ -223,32 +223,48 @@ prod-assets-clear: ## Supprimer les assets compilés (production Docker)
 ##---------------------------------------------------------------------------
 
 .PHONY: prod-setup-env
-prod-setup-env: ## Créer le fichier .env.prod.local (première installation)
+prod-setup-env: ## Créer les fichiers de config production (première installation)
+	@echo "$(COLOR_INFO)Configuration de l'environnement de production...$(COLOR_RESET)"
+	@# Créer .env.prod.local (pour Symfony)
 	@if [ -f .env.prod.local ]; then \
-		echo "$(COLOR_WARNING)⚠️  Le fichier .env.prod.local existe déjà !$(COLOR_RESET)"; \
-		echo "Si vous voulez le recréer, supprimez-le d'abord : rm .env.prod.local"; \
+		echo "$(COLOR_WARNING)⚠️  Le fichier .env.prod.local existe déjà, ignoré.$(COLOR_RESET)"; \
 	else \
-		echo "$(COLOR_INFO)Création du fichier .env.prod.local...$(COLOR_RESET)"; \
-		echo "# Configuration de production - NE PAS COMMITER" > .env.prod.local; \
+		echo "$(COLOR_INFO)Création du fichier .env.prod.local (pour Symfony)...$(COLOR_RESET)"; \
+		echo "# Configuration Symfony de production - NE PAS COMMITER" > .env.prod.local; \
 		echo "" >> .env.prod.local; \
 		echo "###> Secrets de production ###" >> .env.prod.local; \
 		echo "APP_SECRET=$$(openssl rand -hex 32 2>/dev/null || php -r 'echo bin2hex(random_bytes(32));')" >> .env.prod.local; \
-		echo "" >> .env.prod.local; \
-		echo "###> Base de données PostgreSQL ###" >> .env.prod.local; \
-		echo "DB_NAME=symfony_prod" >> .env.prod.local; \
-		echo "DB_USER=symfony_prod_user" >> .env.prod.local; \
-		echo "DB_PASSWORD=CHANGEZ_MOI_$$(openssl rand -hex 16 2>/dev/null || php -r 'echo bin2hex(random_bytes(16));')" >> .env.prod.local; \
-		echo "DB_ROOT_PASSWORD=CHANGEZ_MOI_ROOT_$$(openssl rand -hex 16 2>/dev/null || php -r 'echo bin2hex(random_bytes(16));')" >> .env.prod.local; \
 		echo "" >> .env.prod.local; \
 		echo "###> Pterodactyl API ###" >> .env.prod.local; \
 		echo "PTERODACTYL_ADMIN_API_KEY=" >> .env.prod.local; \
 		echo "PTERODACTYL_CLIENT_API_KEY=" >> .env.prod.local; \
 		echo "PTERODACTYL_APPLICATION_API_URL=" >> .env.prod.local; \
 		echo "PTERODACTYL_CLIENT_API_URL=" >> .env.prod.local; \
-		echo "" >> .env.prod.local; \
-		echo "$(COLOR_SUCCESS)✓ Fichier .env.prod.local créé avec des mots de passe générés !$(COLOR_RESET)"; \
-		echo "$(COLOR_WARNING)⚠️  Éditez ce fichier pour vérifier/modifier les valeurs : nano .env.prod.local$(COLOR_RESET)"; \
+		echo "$(COLOR_SUCCESS)✓ Fichier .env.prod.local créé !$(COLOR_RESET)"; \
 	fi
+	@# Vérifier/créer les variables DB dans .env (pour Docker Compose)
+	@echo ""
+	@echo "$(COLOR_INFO)Vérification du fichier .env (pour Docker Compose)...$(COLOR_RESET)"
+	@if ! grep -q "^DB_NAME=" .env 2>/dev/null; then \
+		echo "$(COLOR_WARNING)⚠️  Variables DB manquantes dans .env !$(COLOR_RESET)"; \
+		echo "$(COLOR_INFO)Ajout des variables de base de données...$(COLOR_RESET)"; \
+		echo "" >> .env; \
+		echo "###> Variables Docker Compose Production ###" >> .env; \
+		echo "DB_NAME=symfony_prod" >> .env; \
+		echo "DB_USER=symfony_prod_user" >> .env; \
+		echo "DB_PASSWORD=CHANGEZ_MOI_$$(openssl rand -hex 16 2>/dev/null || php -r 'echo bin2hex(random_bytes(16));')" >> .env; \
+		echo "DB_ROOT_PASSWORD=CHANGEZ_MOI_ROOT_$$(openssl rand -hex 16 2>/dev/null || php -r 'echo bin2hex(random_bytes(16));')" >> .env; \
+		echo "$(COLOR_SUCCESS)✓ Variables ajoutées dans .env$(COLOR_RESET)"; \
+		echo "$(COLOR_WARNING)⚠️  Éditez le fichier .env pour modifier les mots de passe : nano .env$(COLOR_RESET)"; \
+	else \
+		echo "$(COLOR_SUCCESS)✓ Les variables DB existent déjà dans .env$(COLOR_RESET)"; \
+		grep -q "CHANGEZ_MOI" .env && echo "$(COLOR_WARNING)⚠️  Des valeurs 'CHANGEZ_MOI' sont présentes dans .env, pensez à les modifier !$(COLOR_RESET)" || true; \
+	fi
+	@echo ""
+	@echo "$(COLOR_SUCCESS)✓ Configuration terminée !$(COLOR_RESET)"
+	@echo "$(COLOR_INFO)Fichiers à vérifier/éditer :$(COLOR_RESET)"
+	@echo "  - .env (variables Docker Compose) : nano .env"
+	@echo "  - .env.prod.local (secrets Symfony) : nano .env.prod.local"
 
 .PHONY: prod-check-config
 prod-check-config: ## Vérifier la configuration de production

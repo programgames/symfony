@@ -2,7 +2,27 @@
 
 ## Configuration des variables d'environnement
 
-### Ordre de priorité des fichiers .env
+### IMPORTANT : Deux fichiers .env à configurer
+
+Sur le serveur de production, vous devez configurer **2 fichiers distincts** :
+
+#### 1. `.env` - Variables pour Docker Compose
+Ce fichier est utilisé par Docker Compose pour créer les conteneurs (notamment la base de données).
+
+**Variables obligatoires** :
+- `DB_NAME` : Nom de la base de données PostgreSQL
+- `DB_USER` : Utilisateur PostgreSQL
+- `DB_PASSWORD` : Mot de passe PostgreSQL
+- `DB_ROOT_PASSWORD` : Mot de passe root PostgreSQL
+
+#### 2. `.env.prod.local` - Secrets pour Symfony
+Ce fichier est chargé par Symfony **à l'intérieur** du conteneur PHP.
+
+**Variables importantes** :
+- `APP_SECRET` : Clé secrète Symfony (générée automatiquement)
+- `PTERODACTYL_*` : Clés API si nécessaire
+
+### Ordre de priorité des fichiers .env (Symfony)
 
 Symfony charge les fichiers dans cet ordre (le dernier écrase le précédent) :
 1. `.env` - Valeurs par défaut (commitées)
@@ -12,37 +32,62 @@ Symfony charge les fichiers dans cet ordre (le dernier écrase le précédent) :
 
 ### Sur le serveur de production
 
-#### Méthode 1 : Fichier .env.prod.local (recommandé)
-
-Sur votre serveur, créez un fichier `.env.prod.local` :
+#### Configuration automatique (recommandé)
 
 ```bash
 # Se connecter au serveur de production
 cd /path/to/your/project
 
-# Créer le fichier de configuration
+# Créer automatiquement les fichiers de configuration
+make prod-setup-env
+
+# Éditer le fichier .env pour les variables Docker Compose
+nano .env
+# Vérifiez/modifiez les variables DB_NAME, DB_USER, DB_PASSWORD, DB_ROOT_PASSWORD
+
+# Éditer le fichier .env.prod.local pour les secrets Symfony (optionnel, APP_SECRET déjà généré)
 nano .env.prod.local
 ```
 
-Contenu du fichier `.env.prod.local` :
+#### Configuration manuelle
+
+**1. Fichier `.env` (pour Docker Compose)**
+
+```bash
+# Éditer le fichier .env
+nano .env
+```
+
+Ajoutez/modifiez ces lignes à la fin du fichier :
+
+```bash
+###> Variables Docker Compose Production ###
+DB_NAME=symfony_prod
+DB_USER=symfony_prod_user
+DB_PASSWORD=VotreMotDePasseSecurise123!
+DB_ROOT_PASSWORD=VotreMotDePasseRootSecurise456!
+```
+
+**2. Fichier `.env.prod.local` (pour Symfony)**
+
+```bash
+# Créer le fichier
+nano .env.prod.local
+```
+
+Contenu :
 
 ```bash
 ###> Secrets de production ###
 APP_SECRET=VotreCléSecrèteAléatoire_CHANGEZ_MOI
 
-###> Base de données PostgreSQL ###
-DB_NAME=symfony_prod
-DB_USER=symfony_prod_user
-DB_PASSWORD=MotDePasseSecurise_CHANGEZ_MOI
-DB_ROOT_PASSWORD=MotDePasseRootSecurise_CHANGEZ_MOI
-
-###> Pterodactyl API ###
+###> Pterodactyl API (si nécessaire) ###
 PTERODACTYL_ADMIN_API_KEY=votre_cle_admin
 PTERODACTYL_CLIENT_API_KEY=votre_cle_client
 PTERODACTYL_APPLICATION_API_URL=https://panel.example.com
 PTERODACTYL_CLIENT_API_URL=https://panel.example.com
 
-###> Mailer ###
+###> Mailer (si nécessaire) ###
 MAILER_DSN=smtp://user:password@smtp.example.com:587
 ```
 
