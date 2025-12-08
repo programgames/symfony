@@ -219,6 +219,50 @@ prod-assets-clear: ## Supprimer les assets compilés (production Docker)
 	$(DOCKER_COMPOSE_PROD) exec $(PHP_SERVICE) rm -rf public/assets/*
 
 ##
+## Configuration Production
+##---------------------------------------------------------------------------
+
+.PHONY: prod-setup-env
+prod-setup-env: ## Créer le fichier .env.prod.local (première installation)
+	@if [ -f .env.prod.local ]; then \
+		echo "$(COLOR_WARNING)⚠️  Le fichier .env.prod.local existe déjà !$(COLOR_RESET)"; \
+		echo "Si vous voulez le recréer, supprimez-le d'abord : rm .env.prod.local"; \
+	else \
+		echo "$(COLOR_INFO)Création du fichier .env.prod.local...$(COLOR_RESET)"; \
+		echo "# Configuration de production - NE PAS COMMITER" > .env.prod.local; \
+		echo "" >> .env.prod.local; \
+		echo "###> Secrets de production ###" >> .env.prod.local; \
+		echo "APP_SECRET=$$(openssl rand -hex 32 2>/dev/null || php -r 'echo bin2hex(random_bytes(32));')" >> .env.prod.local; \
+		echo "" >> .env.prod.local; \
+		echo "###> Base de données PostgreSQL ###" >> .env.prod.local; \
+		echo "DB_NAME=symfony_prod" >> .env.prod.local; \
+		echo "DB_USER=symfony_prod_user" >> .env.prod.local; \
+		echo "DB_PASSWORD=CHANGEZ_MOI_$$(openssl rand -hex 16 2>/dev/null || php -r 'echo bin2hex(random_bytes(16));')" >> .env.prod.local; \
+		echo "DB_ROOT_PASSWORD=CHANGEZ_MOI_ROOT_$$(openssl rand -hex 16 2>/dev/null || php -r 'echo bin2hex(random_bytes(16));')" >> .env.prod.local; \
+		echo "" >> .env.prod.local; \
+		echo "###> Pterodactyl API ###" >> .env.prod.local; \
+		echo "PTERODACTYL_ADMIN_API_KEY=" >> .env.prod.local; \
+		echo "PTERODACTYL_CLIENT_API_KEY=" >> .env.prod.local; \
+		echo "PTERODACTYL_APPLICATION_API_URL=" >> .env.prod.local; \
+		echo "PTERODACTYL_CLIENT_API_URL=" >> .env.prod.local; \
+		echo "" >> .env.prod.local; \
+		echo "$(COLOR_SUCCESS)✓ Fichier .env.prod.local créé avec des mots de passe générés !$(COLOR_RESET)"; \
+		echo "$(COLOR_WARNING)⚠️  Éditez ce fichier pour vérifier/modifier les valeurs : nano .env.prod.local$(COLOR_RESET)"; \
+	fi
+
+.PHONY: prod-check-config
+prod-check-config: ## Vérifier la configuration de production
+	@echo "$(COLOR_INFO)Vérification de la configuration...$(COLOR_RESET)"
+	@if [ -f .env.prod.local ]; then \
+		echo "$(COLOR_SUCCESS)✓ .env.prod.local existe$(COLOR_RESET)"; \
+		grep -q "CHANGEZ_MOI" .env.prod.local && echo "$(COLOR_WARNING)⚠️  Des valeurs par défaut 'CHANGEZ_MOI' sont encore présentes !$(COLOR_RESET)" || echo "$(COLOR_SUCCESS)✓ Pas de valeurs 'CHANGEZ_MOI' détectées$(COLOR_RESET)"; \
+	else \
+		echo "$(COLOR_WARNING)⚠️  .env.prod.local n'existe pas. Créez-le avec : make prod-setup-env$(COLOR_RESET)"; \
+	fi
+	@$(DOCKER_COMPOSE_PROD) exec $(PHP_SERVICE) php -m | grep -q pdo_pgsql && echo "$(COLOR_SUCCESS)✓ Extension pdo_pgsql installée$(COLOR_RESET)" || echo "$(COLOR_WARNING)⚠️  Extension pdo_pgsql non trouvée$(COLOR_RESET)"
+	@$(DOCKER_COMPOSE_PROD) exec $(PHP_SERVICE) printenv APP_ENV | grep -q prod && echo "$(COLOR_SUCCESS)✓ APP_ENV=prod$(COLOR_RESET)" || echo "$(COLOR_WARNING)⚠️  APP_ENV n'est pas 'prod'$(COLOR_RESET)"
+
+##
 ## Déploiement Production
 ##---------------------------------------------------------------------------
 
