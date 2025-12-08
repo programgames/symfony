@@ -19,8 +19,14 @@ COLOR_WARNING = \033[33m
 
 .PHONY: help
 help: ## Affiche cette aide
+ifeq ($(OS),Windows_NT)
+	@chcp 65001 > nul
+	@echo Commandes disponibles pour $(PROJECT_NAME):
+	@grep -E "^[a-zA-Z_-]+:.*## " Makefile | sort
+else
 	@echo "$(COLOR_INFO)Commandes disponibles pour $(PROJECT_NAME):$(COLOR_RESET)"
 	@grep -E '^[a-zA-Z_-]+:.*?## ' Makefile | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(COLOR_SUCCESS)%-30s$(COLOR_RESET) %s\n", $$1, $$2}'
+endif
 
 ##
 ## Installation locale (sans Docker)
