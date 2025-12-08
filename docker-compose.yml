@@ -1,0 +1,47 @@
+services:
+
+    php:
+        build: ./docker/php
+        networks:
+            - web
+        volumes:
+            - ./:/var/www/symfony
+        environment:
+            DATABASE_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?serverVersion=16&charset=utf8"
+
+    nginx:
+        build: ./docker/nginx
+        ports:
+            - "80:80"
+        volumes:
+            - ./:/var/www/symfony
+            - ./docker/nginx/templates/default.conf.template:/etc/nginx/conf.d/default.conf
+        networks:
+            - web
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.nginx.rule=Host(`minecraft.multimod.ovh`)"
+            - "traefik.http.routers.nginx.entrypoints=websecure"
+            - "traefik.http.services.nginx.loadbalancer.server.port=80"
+            - "traefik.http.routers.nginx.tls=true"
+            - "traefik.http.routers.nginx.tls.certresolver=default"
+            - "traefik.docker.network=web"
+    db:
+        image: postgres:16-alpine
+        environment:
+            POSTGRES_DB: ${DB_NAME}
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        ports:
+            - "5432:5432"
+        volumes:
+            - db_data:/var/lib/postgresql/data
+        networks:
+            - web
+
+volumes:
+    db_data:
+
+networks:
+    web:
+
