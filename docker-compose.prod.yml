@@ -11,6 +11,7 @@ services:
         environment:
             APP_ENV: prod
             APP_DEBUG: 0
+            DATABASE_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?serverVersion=16&charset=utf8"
 
     nginx:
         build: ./docker/nginx
@@ -28,14 +29,18 @@ services:
             - "traefik.http.routers.minecraft.tls.certresolver=default"
             - "traefik.docker.network=web"
     db:
-        image: mysql:8.0.33
+        image: postgres:16-alpine
         environment:
-            MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD
-            MYSQL_DATABASE: $DB_NAME
-            MYSQL_USER: $DB_USER
-            MYSQL_PASSWORD: $DB_PASSWORD
+            POSTGRES_DB: ${DB_NAME}
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        volumes:
+            - db_data:/var/lib/postgresql/data
         networks:
             - web
+volumes:
+    db_data:
+
 networks:
     web:
         external: true
