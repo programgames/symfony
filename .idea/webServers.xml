@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="9dab2c8b-9d63-4a8c-a194-edde5f80c103" name="minecraft">
+        <fileTransfer rootFolder="/docker/symfony/" accessType="SFTP" host="multimod.ovh" port="1997" sshConfigId="b05d78b4-d119-4b48-9f3c-eea9e6fb0236" sshConfig="julien@multimod.ovh:1997 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

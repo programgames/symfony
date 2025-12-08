@@ -1,0 +1,13 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\phpstorm]
+@="URL:phpstorm protocol"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\phpstorm\shell]
+
+[HKEY_CLASSES_ROOT\phpstorm\shell\open]
+
+[HKEY_CLASSES_ROOT\phpstorm\shell\open\command]
+@="\"C:\\Users\\Julien\\AppData\\Local\\Progams\\PhpStorm\\phpstorm64.exe\" \"%1\""
+C:\Users\Julien\AppData\Local\Programs\PhpStorm

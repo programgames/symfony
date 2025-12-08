@@ -1,0 +1,39 @@
+services:
+    php:
+        build:
+            dockerfile: ./docker/php/Dockerfile
+            context: .
+        networks:
+            - web
+        working_dir: /var/www/symfony
+        volumes:
+            - ./:/var/www/symfony
+
+    nginx:
+        build: ./docker/nginx
+        volumes:
+            - ./:/var/www/symfony
+            - ./docker/nginx/templates/default.conf.template:/etc/nginx/conf.d/default.conf
+        networks:
+            - web
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.minecraft.rule=Host(`minecraft.multimod.ovh`)"
+            - "traefik.http.routers.minecraft.entrypoints=websecure"
+            - "traefik.http.services.minecraft.loadbalancer.server.port=80"
+            - "traefik.http.routers.minecraft.tls=true"
+            - "traefik.http.routers.minecraft.tls.certresolver=default"
+            - "traefik.docker.network=web"
+    db:
+        image: mysql:8.0.33
+        environment:
+            MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD
+            MYSQL_DATABASE: $DB_NAME
+            MYSQL_USER: $DB_USER
+            MYSQL_PASSWORD: $DB_PASSWORD
+        networks:
+            - web
+networks:
+    web:
+        external: true
+
