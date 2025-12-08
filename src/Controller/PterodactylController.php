@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Pterodactyl\DTO\AllocationListResponseDTO;
+use App\Pterodactyl\DTO\ServerListResponseDTO;
 use App\Pterodactyl\PterodactylApiClient;
+use App\Wings\WingsApiClient;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,19 +21,32 @@ final class PterodactylController extends AbstractController
     }
 
     #[Route('/servers', name: 'servers')]
-    public function serversAction(PterodactylApiClient $apiClient): Response
+    public function serversAction(PterodactylApiClient $apiClient, WingsApiClient $wingsApiClient): Response
     {
-        $servers = $apiClient->clientRequest('');
+        /////////////////
         $serversFormatted = [];
 
-        foreach ($servers['data'] as $server) {
+        $serversResponse = $apiClient->adminRequest('/servers');
+        $serverList = ServerListResponseDTO::fromArray($serversResponse);
+        foreach ($serverList->servers as $server) {
+            $allocationsResponse = $apiClient->clientRequest('/servers/' . $server->identifier . '/network/allocations');
+            $wingServerStatus = $wingsApiClient->wingsRequest('hpZBOcQXyK5abUQhpQ4HDkBU3twZVuEfJ9wQOyvSq6SEb8p1wnKKofN1JwKpVpH3','/api/servers/' . $server->uuid);
+            $state = $wingServerStatus['state'];
+            $allocationList = AllocationListResponseDTO::fromArray($allocationsResponse);
+
+            $defaultAllocation = $allocationList->allocations[0] ?? null;
+            $port = $defaultAllocation?->port;
+
             $serversFormatted[] = [
-                'name' => $server['attributes']['name'],
-                'memory' => $server['attributes']['limits']['memory'],
-                'port' => $server['attributes']['relationships']['allocations']['data'][0]['attributes']['port'],
-                'url' => 'multimod.ovh:' . $server['attributes']['relationships']['allocations']['data'][0]['attributes']['port'],
+                'state' => $state,
+                'name' => $server->name,
+                'memoryLimit' => $server->limits->memory,
+                'diskLimit' => $server->limits->disk,
+                'port' => $port,
+                'url' => $port ? 'multimod.ovh:' . $port : null,
             ];
         }
+
         return $this->render('pterodactyl/servers.html.twig', [
             'data' => $serversFormatted
         ]);

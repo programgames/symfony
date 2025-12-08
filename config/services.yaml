@@ -11,6 +11,7 @@ parameters:
     pterodactyl.client_api_key: '%env(PTERODACTYL_CLIENT_API_KEY)%'
     pterodactyl.application_api_url: '%env(PTERODACTYL_APPLICATION_API_URL)%'
     pterodactyl.client_api_url: '%env(PTERODACTYL_CLIENT_API_URL)%'
+    wings.endpoint:  '%env(WINGS_CLIENT_API_URL)%'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -29,5 +30,8 @@ services:
             $clientApiUrl: '%pterodactyl.client_api_url%'
             $applicationApiUrl: '%pterodactyl.application_api_url%'
 
+    App\Wings\WingsApiClient:
+        arguments:
+            $applicationApiUrl: '%wings.endpoint%'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

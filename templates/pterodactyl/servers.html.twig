@@ -10,6 +10,7 @@
             <table class="table table-hover table-striped align-middle">
                 <thead class="table-dark">
                 <tr>
+                    <th scope="col">Statut</th>
                     <th scope="col">Nom du Serveur</th>
                     <th scope="col">Mémoire (MB)</th>
                     <th scope="col">Port</th>
@@ -20,10 +21,17 @@
                 {% for server in data %}
                     <tr>
                         <td>
+                            {% if server.state == 'offline' %}
+                                <span class="badge bg-danger">Suspendu</span>
+                            {% else %}
+                                <span class="badge bg-success">Actif</span>
+                            {% endif %}
+                        </td>
+                        <td>
                             <strong>{{ server.name }}</strong>
                         </td>
                         <td>
-                            <span class="badge bg-info text-dark">{{ server.memory }} MB</span>
+                            <span class="badge bg-info text-dark">{{ server.memoryLimit }} MB</span>
                         </td>
                         <td>
                             <code class="text-muted">{{ server.port }}</code>
@@ -34,7 +42,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="4" class="text-center text-muted">
+                        <td colspan="5" class="text-center text-muted">
                             Aucun serveur disponible
                         </td>
                     </tr>
