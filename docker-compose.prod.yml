@@ -8,6 +8,9 @@ services:
         working_dir: /var/www/symfony
         volumes:
             - ./:/var/www/symfony
+        environment:
+            APP_ENV: prod
+            APP_DEBUG: 0
 
     nginx:
         build: ./docker/nginx
