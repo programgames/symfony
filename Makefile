@@ -163,6 +163,10 @@ prod-logs-nginx: ## Voir les logs du conteneur Nginx (production)
 prod-logs-db: ## Voir les logs du conteneur DB (production)
 	$(DOCKER_COMPOSE_PROD) logs -f $(DB_SERVICE)
 
+.PHONY: prod-logs-app
+prod-logs-app: ## Voir les logs applicatifs Symfony en continu (production)
+	$(DOCKER_COMPOSE_PROD) logs -f $(PHP_SERVICE)
+
 .PHONY: prod-bash
 prod-bash: ## Accéder au shell du conteneur PHP (production)
 	$(DOCKER_COMPOSE_PROD) exec $(PHP_SERVICE) bash
@@ -170,6 +174,16 @@ prod-bash: ## Accéder au shell du conteneur PHP (production)
 .PHONY: prod-bash-nginx
 prod-bash-nginx: ## Accéder au shell du conteneur Nginx (production)
 	$(DOCKER_COMPOSE_PROD) exec $(NGINX_SERVICE) sh
+
+##
+## Permissions Docker Production
+##---------------------------------------------------------------------------
+
+.PHONY: prod-fix-permissions
+prod-fix-permissions: ## Corriger les permissions des répertoires var/ (production Docker)
+	$(DOCKER_COMPOSE_PROD) exec -u root $(PHP_SERVICE) chown -R www-data:www-data /var/www/symfony/var
+	$(DOCKER_COMPOSE_PROD) exec -u root $(PHP_SERVICE) chmod -R 775 /var/www/symfony/var
+	@echo "$(COLOR_SUCCESS)✓ Permissions corrigées !$(COLOR_RESET)"
 
 ##
 ## Cache Docker Production
@@ -294,6 +308,8 @@ deploy: ## Déploiement complet en production
 	git pull --ff-only
 	$(DOCKER_COMPOSE_PROD) build
 	$(DOCKER_COMPOSE_PROD) up -d
+	$(DOCKER_COMPOSE_PROD) exec -u root $(PHP_SERVICE) chown -R www-data:www-data /var/www/symfony/var
+	$(DOCKER_COMPOSE_PROD) exec -u root $(PHP_SERVICE) chmod -R 775 /var/www/symfony/var
 	$(DOCKER_COMPOSE_PROD) exec -u root $(PHP_SERVICE) git config --system --add safe.directory /var/www/symfony || true
 	$(DOCKER_COMPOSE_PROD) exec $(PHP_SERVICE) composer install --no-dev --optimize-autoloader --no-interaction
 	$(DOCKER_COMPOSE_PROD) exec $(PHP_SERVICE) php bin/console doctrine:migrations:migrate --no-interaction --env=prod
