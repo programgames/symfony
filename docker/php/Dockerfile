@@ -29,5 +29,10 @@ COPY docker/php/conf.d/php.prod.ini /usr/local/etc/php/conf.d/php.ini
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Créer les répertoires nécessaires avec les bonnes permissions
+RUN mkdir -p /var/www/symfony/var/cache /var/www/symfony/var/log \
+    && chown -R www-data:www-data /var/www/symfony/var \
+    && chmod -R 775 /var/www/symfony/var
+
 # Exposer le port 9000 (par défaut de php-fpm)
 EXPOSE 9000
