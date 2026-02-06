@@ -1,20 +1,506 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Bienvenue - Mon Univers Gaming & Sport{% endblock %}
+
+{% block stylesheets %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&family=Bangers&display=swap');
+
+    :root {
+        --pokemon-yellow: #FFCB05;
+        --pokemon-blue: #3D7DCA;
+        --minecraft-green: #5D8C3E;
+        --minecraft-brown: #8B5A2B;
+        --dbz-orange: #F89820;
+        --dbz-blue: #2563EB;
+        --tomb-raider-gold: #C9A227;
+        --tomb-raider-dark: #1a1a2e;
+        --trail-green: #228B22;
+        --trail-earth: #8B4513;
+        --gym-red: #DC2626;
+        --gym-steel: #6B7280;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Hero Section */
+    .hero {
+        position: relative;
+        padding: 60px 20px;
+        text-align: center;
+        background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+    }
+
+    .hero h1 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 3rem;
+        font-weight: 900;
+        background: linear-gradient(45deg, var(--pokemon-yellow), var(--dbz-orange), var(--gym-red), var(--pokemon-blue));
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradient-shift 5s ease infinite;
+        text-shadow: 0 0 30px rgba(255, 203, 5, 0.3);
+        margin-bottom: 10px;
+    }
+
+    .hero .subtitle {
+        font-family: 'Bangers', cursive;
+        font-size: 1.5rem;
+        color: #fff;
+        letter-spacing: 3px;
+        opacity: 0.9;
+    }
+
+    @keyframes gradient-shift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    /* Navigation Links */
+    .nav-section {
+        padding: 40px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .nav-section h2 {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 1.2rem;
+        color: var(--minecraft-green);
+        text-align: center;
+        margin-bottom: 30px;
+        text-shadow: 2px 2px 0 #000;
+    }
+
+    .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .nav-link-card {
+        background: linear-gradient(145deg, var(--minecraft-green), var(--minecraft-brown));
+        border: 4px solid #000;
+        border-radius: 8px;
+        padding: 20px 40px;
+        text-decoration: none;
+        color: #fff;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+        box-shadow: 4px 4px 0 #000, 0 0 20px rgba(93, 140, 62, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .nav-link-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .nav-link-card:hover::before {
+        left: 100%;
+    }
+
+    .nav-link-card:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0 #000, 0 0 30px rgba(93, 140, 62, 0.5);
+    }
+
+    .nav-link-card .icon {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    /* Theme Grid */
+    .themes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        padding: 40px 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .theme-card {
+        border-radius: 20px;
+        padding: 30px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+        min-height: 280px;
+    }
+
+    .theme-card:hover {
+        transform: translateY(-10px) scale(1.02);
+    }
+
+    .theme-card h3 {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .theme-card p {
+        font-size: 1rem;
+        line-height: 1.6;
+        position: relative;
+        z-index: 2;
+        opacity: 0.9;
+    }
+
+    .theme-card .emoji-bg {
+        position: absolute;
+        font-size: 8rem;
+        opacity: 0.15;
+        right: -20px;
+        bottom: -20px;
+        z-index: 1;
+    }
+
+    /* Pokemon Card */
+    .pokemon-card {
+        background: linear-gradient(135deg, var(--pokemon-blue) 0%, #1E3A5F 100%);
+        border: 4px solid var(--pokemon-yellow);
+        box-shadow: 0 10px 40px rgba(255, 203, 5, 0.3), inset 0 0 60px rgba(255, 203, 5, 0.1);
+        color: #fff;
+    }
+
+    .pokemon-card h3 {
+        font-family: 'Bangers', cursive;
+        color: var(--pokemon-yellow);
+        text-shadow: 2px 2px 0 #000;
+        letter-spacing: 2px;
+    }
+
+    .pokemon-card::after {
+        content: '';
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        background: radial-gradient(circle, var(--pokemon-yellow) 30%, transparent 31%),
+                    radial-gradient(circle, #fff 20%, transparent 21%);
+        top: 20px;
+        right: 20px;
+        opacity: 0.3;
+        border-radius: 50%;
+        border: 3px solid var(--pokemon-yellow);
+    }
+
+    /* Minecraft Card */
+    .minecraft-card {
+        background: linear-gradient(135deg, var(--minecraft-green) 0%, #2D4A1C 100%);
+        border: 4px solid var(--minecraft-brown);
+        box-shadow: 0 10px 40px rgba(93, 140, 62, 0.3);
+        color: #fff;
+        image-rendering: pixelated;
+    }
+
+    .minecraft-card h3 {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 1.2rem;
+        color: #fff;
+        text-shadow: 3px 3px 0 #000;
+    }
+
+    .minecraft-card .pixel-border {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        border: 2px dashed rgba(255,255,255,0.2);
+    }
+
+    /* DBZ Card */
+    .dbz-card {
+        background: linear-gradient(135deg, var(--dbz-orange) 0%, #B85C00 100%);
+        border: 4px solid var(--dbz-blue);
+        box-shadow: 0 10px 40px rgba(248, 152, 32, 0.4), 0 0 60px rgba(37, 99, 235, 0.2);
+        color: #fff;
+        position: relative;
+    }
+
+    .dbz-card h3 {
+        font-family: 'Bangers', cursive;
+        color: #fff;
+        text-shadow: 3px 3px 0 var(--dbz-blue), -1px -1px 0 #000;
+        font-size: 2.2rem;
+    }
+
+    .dbz-card::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
+        animation: aura-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes aura-pulse {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+        50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+    }
+
+    /* Tomb Raider Card */
+    .tomb-raider-card {
+        background: linear-gradient(135deg, var(--tomb-raider-dark) 0%, #0d0d1a 100%);
+        border: 4px solid var(--tomb-raider-gold);
+        box-shadow: 0 10px 40px rgba(201, 162, 39, 0.3);
+        color: #fff;
+    }
+
+    .tomb-raider-card h3 {
+        font-family: 'Orbitron', sans-serif;
+        color: var(--tomb-raider-gold);
+        text-shadow: 0 0 20px rgba(201, 162, 39, 0.5);
+    }
+
+    .tomb-raider-card .artifact {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border: 3px solid var(--tomb-raider-gold);
+        transform: rotate(45deg);
+        top: 20px;
+        right: 40px;
+        opacity: 0.4;
+    }
+
+    .tomb-raider-card .artifact::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 20px;
+        height: 20px;
+        background: var(--tomb-raider-gold);
+        border-radius: 50%;
+    }
+
+    /* Trail Card */
+    .trail-card {
+        background: linear-gradient(135deg, var(--trail-green) 0%, #145214 100%);
+        border: 4px solid var(--trail-earth);
+        box-shadow: 0 10px 40px rgba(34, 139, 34, 0.3);
+        color: #fff;
+    }
+
+    .trail-card h3 {
+        font-family: 'Orbitron', sans-serif;
+        color: #90EE90;
+        text-shadow: 2px 2px 0 #000;
+    }
+
+    .trail-card .mountain {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-left: 80px solid transparent;
+        border-right: 80px solid transparent;
+        border-bottom: 120px solid rgba(255,255,255,0.1);
+    }
+
+    .trail-card .mountain::before {
+        content: '';
+        position: absolute;
+        top: -60px;
+        left: -40px;
+        width: 0;
+        height: 0;
+        border-left: 40px solid transparent;
+        border-right: 40px solid transparent;
+        border-bottom: 60px solid rgba(255,255,255,0.15);
+    }
+
+    /* Gym Card */
+    .gym-card {
+        background: linear-gradient(135deg, var(--gym-red) 0%, #7F1D1D 100%);
+        border: 4px solid var(--gym-steel);
+        box-shadow: 0 10px 40px rgba(220, 38, 38, 0.3);
+        color: #fff;
+    }
+
+    .gym-card h3 {
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 900;
+        color: #fff;
+        text-shadow: 2px 2px 0 #000;
+        text-transform: uppercase;
+    }
+
+    .gym-card .weight {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        width: 60px;
+        height: 15px;
+        background: var(--gym-steel);
+        border-radius: 3px;
+        opacity: 0.5;
+    }
+
+    .gym-card .weight::before,
+    .gym-card .weight::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 40px;
+        background: var(--gym-steel);
+        top: 50%;
+        transform: translateY(-50%);
+        border-radius: 3px;
+    }
+
+    .gym-card .weight::before { left: -25px; }
+    .gym-card .weight::after { right: -25px; }
+
+    /* Footer */
+    .footer {
+        text-align: center;
+        padding: 40px 20px;
+        color: rgba(255,255,255,0.5);
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.8rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero h1 { font-size: 2rem; }
+        .hero .subtitle { font-size: 1rem; }
+        .themes-grid { grid-template-columns: 1fr; padding: 20px; }
+        .theme-card { min-height: 220px; }
+        .nav-link-card { padding: 15px 25px; font-size: 0.7rem; }
+    }
+
+    /* Floating particles */
+    .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 0;
+    }
+
+    .particle {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: rgba(255, 203, 5, 0.3);
+        border-radius: 50%;
+        animation: float-up 15s infinite;
+    }
+
+    @keyframes float-up {
+        0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+    }
+</style>
+{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/symfony/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>/var/www/symfony/templates/home/index.html.twig</code></li>
-    </ul>
+<div class="particles">
+    {% for i in 1..15 %}
+    <div class="particle" style="left: {{ random(5, 95) }}%; animation-delay: {{ random(0, 10) }}s; animation-duration: {{ random(12, 20) }}s; background: {{ random(['rgba(255,203,5,0.3)', 'rgba(93,140,62,0.3)', 'rgba(248,152,32,0.3)', 'rgba(220,38,38,0.3)']) }};"></div>
+    {% endfor %}
 </div>
+
+<header class="hero">
+    <h1>Mon Univers</h1>
+    <p class="subtitle">Gaming - Sport - Passion</p>
+</header>
+
+<nav class="nav-section">
+    <h2>Navigation</h2>
+    <div class="nav-links">
+        <a href="{{ path('servers') }}" class="nav-link-card">
+            <span class="icon">⛏️</span>
+            Serveurs Minecraft
+        </a>
+    </div>
+</nav>
+
+<main class="themes-grid">
+    <!-- Pokemon -->
+    <article class="theme-card pokemon-card">
+        <h3>Pokemon</h3>
+        <p>Attrapez-les tous ! Fan depuis la premiere generation, de Pikachu a Arceus, l'aventure Pokemon continue de m'accompagner. Dresseur dans l'ame, toujours pret pour un combat !</p>
+        <span class="emoji-bg">⚡</span>
+    </article>
+
+    <!-- Minecraft -->
+    <article class="theme-card minecraft-card">
+        <div class="pixel-border"></div>
+        <h3>Minecraft</h3>
+        <p>Construire, explorer, survivre. Des premieres nuits terrifiantes aux mega-builds epiques, Minecraft est un canvas infini de creativite et d'aventures sans fin.</p>
+        <span class="emoji-bg">🧱</span>
+    </article>
+
+    <!-- Dragon Ball Z -->
+    <article class="theme-card dbz-card">
+        <h3>Dragon Ball Z</h3>
+        <p>KAMEHAMEHAAAAA ! L'epopee de Goku, les combats legendaires contre Freezer, Cell et Buu. La saga qui a defini toute une generation de fans d'anime !</p>
+        <span class="emoji-bg">🔥</span>
+    </article>
+
+    <!-- Tomb Raider -->
+    <article class="theme-card tomb-raider-card">
+        <div class="artifact"></div>
+        <h3>Tomb Raider</h3>
+        <p>Lara Croft, l'aventuriere iconique. Des tombeaux antiques aux mysteres les plus profonds, chaque expedition est une promesse de decouvertes extraordinaires.</p>
+        <span class="emoji-bg">🏛️</span>
+    </article>
+
+    <!-- Trail -->
+    <article class="theme-card trail-card">
+        <div class="mountain"></div>
+        <h3>Trail Running</h3>
+        <p>Courir en pleine nature, gravir les sommets, repousser ses limites. Le trail, c'est la liberte absolue, l'effort pur et la connexion avec la montagne.</p>
+        <span class="emoji-bg">🏔️</span>
+    </article>
+
+    <!-- Musculation -->
+    <article class="theme-card gym-card">
+        <div class="weight"></div>
+        <h3>Musculation</h3>
+        <p>No pain, no gain ! La salle de sport, c'est le temple de la discipline. Chaque repetition compte, chaque seance construit un meilleur soi-meme.</p>
+        <span class="emoji-bg">💪</span>
+    </article>
+</main>
+
+<footer class="footer">
+    <p>Fait avec passion - 2024</p>
+</footer>
 {% endblock %}
