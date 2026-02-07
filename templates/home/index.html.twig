@@ -1,20 +1,351 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Accueil - GameHub{% endblock %}
+
+{% block stylesheets %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
+        font-family: 'Rajdhani', sans-serif;
+        overflow-x: hidden;
+    }
+
+    /* Animated background grid */
+    .bg-grid {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image:
+            linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 50px 50px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* Floating particles */
+    .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+        overflow: hidden;
+    }
+
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(0, 255, 255, 0.6);
+        border-radius: 50%;
+        animation: float 15s infinite;
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(100vh) rotate(0deg);
+            opacity: 0;
+        }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% {
+            transform: translateY(-100vh) rotate(720deg);
+            opacity: 0;
+        }
+    }
+
+    .main-container {
+        position: relative;
+        z-index: 10;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    /* Header styling */
+    .header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .logo {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 4rem;
+        font-weight: 900;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        text-shadow:
+            0 0 10px rgba(0, 255, 255, 0.8),
+            0 0 20px rgba(0, 255, 255, 0.6),
+            0 0 40px rgba(0, 255, 255, 0.4),
+            0 0 80px rgba(0, 255, 255, 0.2);
+        animation: pulse-glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse-glow {
+        from {
+            text-shadow:
+                0 0 10px rgba(0, 255, 255, 0.8),
+                0 0 20px rgba(0, 255, 255, 0.6),
+                0 0 40px rgba(0, 255, 255, 0.4),
+                0 0 80px rgba(0, 255, 255, 0.2);
+        }
+        to {
+            text-shadow:
+                0 0 15px rgba(0, 255, 255, 1),
+                0 0 30px rgba(0, 255, 255, 0.8),
+                0 0 60px rgba(0, 255, 255, 0.6),
+                0 0 100px rgba(0, 255, 255, 0.4);
+        }
+    }
+
+    .tagline {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.6);
+        letter-spacing: 0.5em;
+        margin-top: 1rem;
+        text-transform: uppercase;
+    }
+
+    /* Cards container */
+    .cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        max-width: 900px;
+        width: 100%;
+    }
+
+    /* Card styling */
+    .game-card {
+        position: relative;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 2.5rem;
+        text-decoration: none;
+        color: #fff;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+    }
+
+    .game-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 20px;
+        padding: 2px;
+        background: linear-gradient(135deg, var(--card-color), transparent 50%);
+        -webkit-mask:
+            linear-gradient(#fff 0 0) content-box,
+            linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .game-card:hover::before {
+        opacity: 1;
+    }
+
+    .game-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.4),
+            0 0 30px var(--card-glow);
+    }
+
+    .game-card.pokemon {
+        --card-color: #ffcc00;
+        --card-glow: rgba(255, 204, 0, 0.3);
+    }
+
+    .game-card.minecraft {
+        --card-color: #44ff44;
+        --card-glow: rgba(68, 255, 68, 0.3);
+    }
+
+    .card-icon {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 1.5rem;
+        transition: transform 0.4s ease;
+    }
+
+    .game-card:hover .card-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .card-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        color: var(--card-color);
+    }
+
+    .card-description {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.6;
+    }
+
+    .card-arrow {
+        position: absolute;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        width: 40px;
+        height: 40px;
+        border: 2px solid var(--card-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: all 0.3s ease;
+    }
+
+    .game-card:hover .card-arrow {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .card-arrow svg {
+        width: 20px;
+        height: 20px;
+        fill: var(--card-color);
+    }
+
+    /* Footer */
+    .footer {
+        margin-top: 4rem;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.9rem;
+    }
+
+    .footer span {
+        color: rgba(0, 255, 255, 0.6);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .logo {
+            font-size: 2.5rem;
+            letter-spacing: 0.15em;
+        }
+
+        .tagline {
+            font-size: 0.9rem;
+            letter-spacing: 0.3em;
+        }
+
+        .cards-container {
+            grid-template-columns: 1fr;
+        }
+
+        .game-card {
+            padding: 2rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<!-- Animated background -->
+<div class="bg-grid"></div>
+<div class="particles">
+    {% for i in 1..20 %}
+    <div class="particle" style="left: {{ random(0, 100) }}%; animation-delay: {{ random(0, 15) }}s; animation-duration: {{ random(10, 20) }}s;"></div>
+    {% endfor %}
+</div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+<div class="main-container">
+    <!-- Header -->
+    <header class="header">
+        <h1 class="logo">GameHub</h1>
+        <p class="tagline">Plateforme de jeux</p>
+    </header>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/symfony/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>/var/www/symfony/templates/home/index.html.twig</code></li>
-    </ul>
+    <!-- Cards -->
+    <div class="cards-container">
+        <!-- Pokemon Quiz Card -->
+        <a href="{{ path('pokemon_quiz_index') }}" class="game-card pokemon">
+            <svg class="card-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Pokeball -->
+                <circle cx="50" cy="50" r="45" stroke="#ffcc00" stroke-width="4" fill="none"/>
+                <path d="M5 50 H95" stroke="#ffcc00" stroke-width="4"/>
+                <circle cx="50" cy="50" r="15" stroke="#ffcc00" stroke-width="4" fill="#1a1a2e"/>
+                <circle cx="50" cy="50" r="8" fill="#ffcc00"/>
+                <!-- Top half fill -->
+                <path d="M50 5 A45 45 0 0 1 95 50 H65 A15 15 0 0 0 35 50 H5 A45 45 0 0 1 50 5" fill="rgba(255, 204, 0, 0.2)"/>
+            </svg>
+            <h2 class="card-title">Quiz Pokemon</h2>
+            <p class="card-description">
+                Teste tes connaissances sur les cris des Pokemon !
+                Mode solo ou multijoueur disponible.
+            </p>
+            <div class="card-arrow">
+                <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+            </div>
+        </a>
+
+        <!-- Minecraft Servers Card -->
+        <a href="{{ path('servers') }}" class="game-card minecraft">
+            <svg class="card-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Minecraft block style -->
+                <rect x="10" y="10" width="80" height="80" stroke="#44ff44" stroke-width="4" fill="rgba(68, 255, 68, 0.1)" rx="4"/>
+                <!-- Grid pattern -->
+                <line x1="10" y1="36" x2="90" y2="36" stroke="#44ff44" stroke-width="2" opacity="0.5"/>
+                <line x1="10" y1="63" x2="90" y2="63" stroke="#44ff44" stroke-width="2" opacity="0.5"/>
+                <line x1="36" y1="10" x2="36" y2="90" stroke="#44ff44" stroke-width="2" opacity="0.5"/>
+                <line x1="63" y1="10" x2="63" y2="90" stroke="#44ff44" stroke-width="2" opacity="0.5"/>
+                <!-- Center block highlight -->
+                <rect x="38" y="38" width="23" height="23" fill="#44ff44" opacity="0.3"/>
+                <!-- Pickaxe hint -->
+                <path d="M25 75 L45 55 L55 65 L35 85 Z" fill="#44ff44" opacity="0.6"/>
+                <circle cx="52" cy="48" r="8" stroke="#44ff44" stroke-width="2" fill="none"/>
+            </svg>
+            <h2 class="card-title">Serveurs Minecraft</h2>
+            <p class="card-description">
+                Consulte l'etat de nos serveurs Minecraft.
+                Rejoins la communaute et construis ton aventure !
+            </p>
+            <div class="card-arrow">
+                <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+            </div>
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Propulse par <span>Symfony</span></p>
+    </footer>
 </div>
 {% endblock %}
