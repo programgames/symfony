@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y \
     libxslt1-dev \
     libpq-dev \
     acl \
+    libchromaprint-tools \
     && echo 'alias sf="php bin/console"' >> ~/.bashrc
 
 RUN docker-php-ext-configure gd --with-jpeg --with-freetype

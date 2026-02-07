@@ -342,3 +342,19 @@ dev-down: ## Arrêter les conteneurs Docker (développement)
 .PHONY: dev-bash
 dev-bash: ## Accéder au shell du conteneur PHP (développement)
 	$(DOCKER_COMPOSE_DEV) exec $(PHP_SERVICE) bash
+
+##
+## Pokemon Quiz
+##---------------------------------------------------------------------------
+
+.PHONY: pokemon-analyze-cries
+pokemon-analyze-cries: ## Analyser les cris Pokemon pour detecter les similarites (local)
+	php bin/console pokemon:analyze-cries
+
+.PHONY: prod-pokemon-analyze-cries
+prod-pokemon-analyze-cries: ## Analyser les cris Pokemon (production Docker)
+	$(DOCKER_COMPOSE_PROD) exec $(PHP_SERVICE) php bin/console pokemon:analyze-cries
+
+.PHONY: dev-pokemon-analyze-cries
+dev-pokemon-analyze-cries: ## Analyser les cris Pokemon (developpement Docker)
+	$(DOCKER_COMPOSE_DEV) exec $(PHP_SERVICE) php bin/console pokemon:analyze-cries
