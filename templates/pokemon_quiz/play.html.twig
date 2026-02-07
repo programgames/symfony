@@ -1,0 +1,1005 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ generationName }} - Pokemon Cry Quiz{% endblock %}
+
+{% block stylesheets %}
+<style>
+    :root {
+        --pokemon-red: #E3350D;
+        --pokemon-blue: #0A285F;
+        --pokemon-yellow: #FFCB05;
+        --pokemon-gold: #B3A125;
+        --success-green: #48BB78;
+    }
+
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        min-height: 100vh;
+        color: white;
+    }
+
+    .quiz-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+
+    .quiz-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .back-link {
+        color: var(--pokemon-yellow);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .back-link:hover {
+        color: white;
+    }
+
+    .gen-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    /* Progress Bar */
+    .progress-section {
+        margin-bottom: 2rem;
+    }
+
+    .progress-text {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .progress-bar-container {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        height: 20px;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        background: linear-gradient(90deg, var(--pokemon-yellow), var(--pokemon-gold));
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.5s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: bold;
+        color: #1a1a2e;
+    }
+
+    /* Volume Control */
+    .volume-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+    }
+
+    .volume-icon {
+        font-size: 1.5rem;
+    }
+
+    .volume-slider {
+        flex: 1;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        outline: none;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: var(--pokemon-yellow);
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    .volume-slider::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: var(--pokemon-yellow);
+        border-radius: 50%;
+        cursor: pointer;
+        border: none;
+    }
+
+    .volume-value {
+        min-width: 50px;
+        text-align: right;
+    }
+
+    /* Cry Version Toggle */
+    .cry-version-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+    }
+
+    .cry-version-label {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .cry-toggle {
+        display: flex;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 25px;
+        padding: 4px;
+    }
+
+    .cry-toggle-btn {
+        padding: 0.5rem 1.25rem;
+        border: none;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.9rem;
+        font-weight: 500;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .cry-toggle-btn.active {
+        background: var(--pokemon-yellow);
+        color: #1a1a2e;
+    }
+
+    .cry-toggle-btn:hover:not(.active) {
+        color: white;
+    }
+
+    /* Game Area */
+    .game-section {
+        text-align: center;
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        margin-bottom: 2rem;
+    }
+
+    .start-section {
+        text-align: center;
+    }
+
+    .start-btn {
+        background: linear-gradient(145deg, var(--pokemon-red), #c52d0b);
+        border: none;
+        color: white;
+        padding: 1rem 3rem;
+        font-size: 1.5rem;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 20px rgba(227, 53, 13, 0.4);
+    }
+
+    .start-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 30px rgba(227, 53, 13, 0.6);
+    }
+
+    .play-section {
+        display: none;
+    }
+
+    .play-section.active {
+        display: block;
+    }
+
+    .play-cry-btn {
+        background: linear-gradient(145deg, var(--pokemon-yellow), var(--pokemon-gold));
+        border: none;
+        color: #1a1a2e;
+        padding: 1.5rem 3rem;
+        font-size: 1.25rem;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        box-shadow: 0 5px 20px rgba(255, 203, 5, 0.4);
+    }
+
+    .play-cry-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 30px rgba(255, 203, 5, 0.6);
+    }
+
+    .play-cry-btn.playing {
+        animation: pulse 0.5s infinite alternate;
+    }
+
+    @keyframes pulse {
+        from { transform: scale(1); }
+        to { transform: scale(1.1); }
+    }
+
+    .speaker-icon {
+        font-size: 1.5rem;
+    }
+
+    /* Hint Button */
+    .hint-btn {
+        background: linear-gradient(145deg, #6366f1, #4f46e5);
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-left: 1rem;
+        box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .hint-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
+    }
+
+    .hint-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Skip Button */
+    .skip-btn {
+        background: linear-gradient(145deg, #ef4444, #dc2626);
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+    }
+
+    .skip-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+    }
+
+    /* Reveal answer display */
+    .reveal-answer {
+        margin-top: 1rem;
+        padding: 1rem 2rem;
+        background: rgba(239, 68, 68, 0.2);
+        border: 2px solid #ef4444;
+        border-radius: 15px;
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .reveal-answer.active {
+        display: inline-block;
+    }
+
+    .reveal-answer .reveal-label {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 0.25rem;
+    }
+
+    .reveal-answer .reveal-name {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #ef4444;
+    }
+
+    .buttons-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    /* Type badges */
+    .hint-display {
+        margin-top: 1.5rem;
+        min-height: 40px;
+    }
+
+    .type-badges {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .type-badge {
+        padding: 0.5rem 1.25rem;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Type colors */
+    .type-normal { background: #A8A878; color: white; }
+    .type-feu { background: #F08030; color: white; }
+    .type-eau { background: #6890F0; color: white; }
+    .type-electrik { background: #F8D030; color: #1a1a2e; }
+    .type-plante { background: #78C850; color: white; }
+    .type-glace { background: #98D8D8; color: #1a1a2e; }
+    .type-combat { background: #C03028; color: white; }
+    .type-poison { background: #A040A0; color: white; }
+    .type-sol { background: #E0C068; color: #1a1a2e; }
+    .type-vol { background: #A890F0; color: white; }
+    .type-psy { background: #F85888; color: white; }
+    .type-insecte { background: #A8B820; color: white; }
+    .type-roche { background: #B8A038; color: white; }
+    .type-spectre { background: #705898; color: white; }
+    .type-dragon { background: #7038F8; color: white; }
+    .type-fee { background: #EE99AC; color: #1a1a2e; }
+
+    /* Answer Input */
+    .answer-section {
+        margin-top: 1.5rem;
+    }
+
+    .answer-input {
+        width: 100%;
+        max-width: 400px;
+        padding: 1rem 1.5rem;
+        font-size: 1.25rem;
+        text-align: center;
+        border: 3px solid rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        outline: none;
+        transition: all 0.3s ease;
+    }
+
+    .answer-input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .answer-input:focus {
+        border-color: var(--pokemon-yellow);
+        box-shadow: 0 0 20px rgba(255, 203, 5, 0.3);
+    }
+
+    .answer-input.correct {
+        border-color: var(--success-green);
+        background: rgba(72, 187, 120, 0.2);
+        animation: correctPulse 0.5s ease;
+    }
+
+    @keyframes correctPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+    }
+
+    .hint-text {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* History Section - Pokemon Grid */
+    .history-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        padding: 1.5rem;
+    }
+
+    .history-title {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        color: var(--pokemon-yellow);
+    }
+
+    .pokemon-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+        gap: 4px;
+        padding: 0.5rem;
+    }
+
+    .pokemon-slot {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 6px;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .pokemon-slot .pokeball-icon {
+        width: 60%;
+        height: 60%;
+        opacity: 0.25;
+    }
+
+    .pokemon-slot.found {
+        background: rgba(72, 187, 120, 0.2);
+        border: 2px solid var(--success-green);
+        animation: pokemonReveal 0.4s ease;
+    }
+
+    .pokemon-slot.found .pokeball-icon {
+        display: none;
+    }
+
+    .pokemon-slot .pokemon-sprite {
+        display: none;
+        width: 85%;
+        height: 85%;
+        image-rendering: pixelated;
+        object-fit: contain;
+    }
+
+    .pokemon-slot.found .pokemon-sprite {
+        display: block;
+    }
+
+    @keyframes pokemonReveal {
+        0% {
+            transform: scale(0.5);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.2);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* Tooltip for pokemon name */
+    .pokemon-slot[data-name]:hover::after {
+        content: attr(data-name);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        z-index: 10;
+        pointer-events: none;
+    }
+
+    .pokemon-slot.found[data-name]:hover::before {
+        content: '';
+        position: absolute;
+        bottom: calc(100% - 4px);
+        left: 50%;
+        transform: translateX(-50%);
+        border: 4px solid transparent;
+        border-top-color: rgba(0, 0, 0, 0.9);
+        z-index: 10;
+    }
+
+    /* Completion Modal */
+    .completion-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .completion-overlay.active {
+        display: flex;
+    }
+
+    .completion-modal {
+        background: linear-gradient(145deg, #2a2a4a, #1a1a3a);
+        border: 3px solid var(--pokemon-yellow);
+        border-radius: 20px;
+        padding: 3rem;
+        text-align: center;
+        max-width: 500px;
+    }
+
+    .completion-title {
+        font-size: 2rem;
+        color: var(--pokemon-yellow);
+        margin-bottom: 1rem;
+    }
+
+    .completion-text {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .completion-btn {
+        background: linear-gradient(145deg, var(--pokemon-yellow), var(--pokemon-gold));
+        border: none;
+        color: #1a1a2e;
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 50px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="quiz-container">
+    <header class="quiz-header">
+        <a href="{{ path('pokemon_quiz_index') }}" class="back-link">
+            <span>&larr;</span> Retour
+        </a>
+        <h1 class="gen-title">{{ generationName }}</h1>
+        <div></div>
+    </header>
+
+    <!-- Progress Bar -->
+    <section class="progress-section">
+        <div class="progress-text">
+            <span>Progression</span>
+            <span id="progress-count">0/{{ totalCount }}</span>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
+        </div>
+    </section>
+
+    <!-- Volume Control -->
+    <section class="volume-section">
+        <span class="volume-icon" id="volume-icon">&#128266;</span>
+        <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="50">
+        <span class="volume-value" id="volume-value">50%</span>
+    </section>
+
+    <!-- Cry Version Toggle -->
+    <section class="cry-version-section">
+        <span class="cry-version-label">Version des cris :</span>
+        <div class="cry-toggle">
+            <button class="cry-toggle-btn" id="cry-legacy-btn" data-version="legacy">Ancien</button>
+            <button class="cry-toggle-btn active" id="cry-latest-btn" data-version="latest">Nouveau</button>
+        </div>
+    </section>
+
+    <!-- Game Area -->
+    <section class="game-section">
+        <div class="start-section" id="start-section">
+            <p style="margin-bottom: 1.5rem; font-size: 1.1rem;">
+                Pret a relever le defi ?<br>
+                Ecoute le cri et trouve le Pokemon !
+            </p>
+            <button class="start-btn" id="start-btn">Commencer !</button>
+        </div>
+
+        <div class="play-section" id="play-section">
+            <div class="buttons-row">
+                <button class="play-cry-btn" id="play-cry-btn">
+                    <span class="speaker-icon">&#128266;</span>
+                    Ecouter le cri
+                </button>
+                <button class="hint-btn" id="hint-btn">
+                    Indice
+                </button>
+                <button class="skip-btn" id="skip-btn">
+                    Passer
+                </button>
+            </div>
+
+            <div class="hint-display" id="hint-display">
+                <div class="type-badges" id="type-badges"></div>
+                <div class="reveal-answer" id="reveal-answer">
+                    <div class="reveal-label">C'etait...</div>
+                    <div class="reveal-name" id="reveal-name"></div>
+                </div>
+            </div>
+
+            <div class="answer-section">
+                <input
+                    type="text"
+                    class="answer-input"
+                    id="answer-input"
+                    placeholder="Nom du Pokemon..."
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                >
+                <p class="hint-text">Les accents et espaces sont ignores</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pokemon Collection Grid -->
+    <section class="history-section">
+        <h2 class="history-title">Collection</h2>
+        <div class="pokemon-grid" id="pokemon-grid">
+            {% for id, pokemon in pokemonData %}
+            <div class="pokemon-slot" data-id="{{ id }}" title="#{{ '%03d'|format(id) }}">
+                <svg class="pokeball-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="48" fill="#333" stroke="#555" stroke-width="3"/>
+                    <path d="M2 50 H98" stroke="#555" stroke-width="3"/>
+                    <circle cx="50" cy="50" r="12" fill="#222" stroke="#555" stroke-width="3"/>
+                </svg>
+                <img class="pokemon-sprite" data-src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{{ id }}.png" alt="{{ pokemon.name }}">
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Completion Modal -->
+    <div class="completion-overlay" id="completion-overlay">
+        <div class="completion-modal">
+            <h2 class="completion-title">Felicitations !</h2>
+            <p class="completion-text">
+                Tu as trouve tous les {{ totalCount }} Pokemon de la {{ generationName }} !
+            </p>
+            <a href="{{ path('pokemon_quiz_index') }}" class="completion-btn">Retour au menu</a>
+        </div>
+    </div>
+
+    <!-- Audio element -->
+    <audio id="pokemon-audio" preload="auto"></audio>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Pokemon data from server
+    const pokemonData = {{ pokemonData|json_encode|raw }};
+    const totalCount = {{ totalCount }};
+    const checkAnswerUrl = '{{ path('pokemon_quiz_check_answer') }}';
+
+    // Game state
+    let remainingPokemon = Object.keys(pokemonData).map(Number);
+    let foundPokemon = [];
+    let currentPokemonId = null;
+    let isPlaying = false;
+    let hintUsed = false;
+    let cryVersion = 'latest'; // 'latest' or 'legacy'
+
+    // DOM elements
+    const startSection = document.getElementById('start-section');
+    const playSection = document.getElementById('play-section');
+    const startBtn = document.getElementById('start-btn');
+    const playCryBtn = document.getElementById('play-cry-btn');
+    const hintBtn = document.getElementById('hint-btn');
+    const typeBadges = document.getElementById('type-badges');
+    const answerInput = document.getElementById('answer-input');
+    const progressBar = document.getElementById('progress-bar');
+    const progressCount = document.getElementById('progress-count');
+    const pokemonGrid = document.getElementById('pokemon-grid');
+    const completionOverlay = document.getElementById('completion-overlay');
+    const volumeSlider = document.getElementById('volume-slider');
+    const volumeValue = document.getElementById('volume-value');
+    const volumeIcon = document.getElementById('volume-icon');
+    const audio = document.getElementById('pokemon-audio');
+    const cryLegacyBtn = document.getElementById('cry-legacy-btn');
+    const cryLatestBtn = document.getElementById('cry-latest-btn');
+    const skipBtn = document.getElementById('skip-btn');
+    const revealAnswer = document.getElementById('reveal-answer');
+    const revealName = document.getElementById('reveal-name');
+
+    // Initialize volume
+    audio.volume = volumeSlider.value / 100;
+
+    // Volume control
+    volumeSlider.addEventListener('input', function() {
+        const volume = this.value / 100;
+        audio.volume = volume;
+        volumeValue.textContent = this.value + '%';
+
+        // Update icon based on volume
+        if (volume === 0) {
+            volumeIcon.innerHTML = '&#128263;'; // Muted
+        } else if (volume < 0.5) {
+            volumeIcon.innerHTML = '&#128265;'; // Low
+        } else {
+            volumeIcon.innerHTML = '&#128266;'; // High
+        }
+    });
+
+    // Shuffle remaining Pokemon
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // Get next random Pokemon
+    function getNextPokemon() {
+        if (remainingPokemon.length === 0) {
+            showCompletion();
+            return null;
+        }
+
+        const randomIndex = Math.floor(Math.random() * remainingPokemon.length);
+        return remainingPokemon[randomIndex];
+    }
+
+    // Load Pokemon cry
+    function loadCry(pokemonId) {
+        // Reset playing state when loading new cry
+        isPlaying = false;
+        playCryBtn.classList.remove('playing');
+
+        // Stop current audio if playing
+        audio.pause();
+        audio.currentTime = 0;
+
+        const cryUrl = `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/${cryVersion}/${pokemonId}.ogg`;
+        audio.src = cryUrl;
+        audio.load();
+    }
+
+    // Switch cry version
+    function setCryVersion(version) {
+        cryVersion = version;
+
+        // Update button states
+        cryLegacyBtn.classList.toggle('active', version === 'legacy');
+        cryLatestBtn.classList.toggle('active', version === 'latest');
+
+        // Reload current cry with new version
+        if (currentPokemonId) {
+            loadCry(currentPokemonId);
+        }
+    }
+
+    // Play current cry
+    function playCry() {
+        if (isPlaying) return;
+        if (!audio.src) return;
+
+        isPlaying = true;
+        playCryBtn.classList.add('playing');
+
+        audio.currentTime = 0;
+        audio.play().catch(err => {
+            console.error('Error playing audio:', err);
+            isPlaying = false;
+            playCryBtn.classList.remove('playing');
+        });
+    }
+
+    // Reset playing state when audio ends
+    audio.addEventListener('ended', function() {
+        isPlaying = false;
+        playCryBtn.classList.remove('playing');
+    });
+
+    // Also reset on pause (in case of interruption)
+    audio.addEventListener('pause', function() {
+        isPlaying = false;
+        playCryBtn.classList.remove('playing');
+    });
+
+    // Update progress
+    function updateProgress() {
+        const found = foundPokemon.length;
+        const percentage = (found / totalCount) * 100;
+
+        progressBar.style.width = percentage + '%';
+        progressCount.textContent = found + '/' + totalCount;
+    }
+
+    // Show hint (Pokemon types)
+    function showHint() {
+        if (!currentPokemonId || hintUsed) return;
+
+        hintUsed = true;
+        hintBtn.disabled = true;
+
+        const types = pokemonData[currentPokemonId].types;
+        typeBadges.innerHTML = '';
+
+        types.forEach(type => {
+            const badge = document.createElement('span');
+            const typeClass = 'type-' + type.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            badge.className = 'type-badge ' + typeClass;
+            badge.textContent = type;
+            typeBadges.appendChild(badge);
+        });
+    }
+
+    // Reset hint for new Pokemon
+    function resetHint() {
+        hintUsed = false;
+        hintBtn.disabled = false;
+        typeBadges.innerHTML = '';
+        revealAnswer.classList.remove('active');
+    }
+
+    // Skip current Pokemon and show answer
+    function skipPokemon() {
+        if (!currentPokemonId) return;
+
+        // Show the answer
+        const pokemonName = pokemonData[currentPokemonId].name;
+        revealName.textContent = pokemonName;
+        revealAnswer.classList.add('active');
+
+        // Remove from remaining (not adding to found)
+        remainingPokemon = remainingPokemon.filter(id => id !== currentPokemonId);
+
+        // Move to next after delay
+        setTimeout(() => {
+            answerInput.value = '';
+
+            currentPokemonId = getNextPokemon();
+            if (currentPokemonId) {
+                loadCry(currentPokemonId);
+                resetHint();
+                answerInput.focus();
+            }
+        }, 2000);
+    }
+
+    // Mark Pokemon as found in the grid
+    function markPokemonFound(pokemonId, pokemonName) {
+        const slot = pokemonGrid.querySelector(`.pokemon-slot[data-id="${pokemonId}"]`);
+        if (slot) {
+            slot.classList.add('found');
+            slot.setAttribute('data-name', pokemonName);
+
+            // Load the sprite
+            const sprite = slot.querySelector('.pokemon-sprite');
+            if (sprite && sprite.dataset.src) {
+                sprite.src = sprite.dataset.src;
+            }
+        }
+    }
+
+    // Show completion
+    function showCompletion() {
+        completionOverlay.classList.add('active');
+    }
+
+    // Start game
+    function startGame() {
+        shuffleArray(remainingPokemon);
+        startSection.style.display = 'none';
+        playSection.classList.add('active');
+
+        currentPokemonId = getNextPokemon();
+        if (currentPokemonId) {
+            loadCry(currentPokemonId);
+            resetHint();
+            answerInput.focus();
+        }
+    }
+
+    // Check answer
+    async function checkAnswer(input) {
+        if (!currentPokemonId || input.trim() === '') return;
+
+        try {
+            const response = await fetch(checkAnswerUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    pokemonId: currentPokemonId,
+                    answer: input,
+                    language: 'fr'
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.correct) {
+                // Correct answer
+                answerInput.classList.add('correct');
+
+                // Update state
+                foundPokemon.push(currentPokemonId);
+                remainingPokemon = remainingPokemon.filter(id => id !== currentPokemonId);
+
+                // Update UI
+                markPokemonFound(currentPokemonId, data.pokemonName);
+                updateProgress();
+
+                // Move to next after a short delay
+                setTimeout(() => {
+                    answerInput.classList.remove('correct');
+                    answerInput.value = '';
+
+                    currentPokemonId = getNextPokemon();
+                    if (currentPokemonId) {
+                        loadCry(currentPokemonId);
+                        resetHint();
+                        answerInput.focus();
+                    }
+                }, 500);
+            }
+        } catch (err) {
+            console.error('Error checking answer:', err);
+        }
+    }
+
+    // Event listeners
+    startBtn.addEventListener('click', startGame);
+
+    playCryBtn.addEventListener('click', playCry);
+
+    hintBtn.addEventListener('click', showHint);
+
+    skipBtn.addEventListener('click', skipPokemon);
+
+    cryLegacyBtn.addEventListener('click', () => setCryVersion('legacy'));
+    cryLatestBtn.addEventListener('click', () => setCryVersion('latest'));
+
+    answerInput.addEventListener('input', function() {
+        checkAnswer(this.value);
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Space to play cry (when not typing)
+        if (e.code === 'Space' && document.activeElement !== answerInput) {
+            e.preventDefault();
+            playCry();
+        }
+
+        // Enter to replay cry
+        if (e.code === 'Enter' && document.activeElement === answerInput) {
+            e.preventDefault();
+            playCry();
+        }
+    });
+
+    // Focus input when clicking play section
+    playSection.addEventListener('click', function(e) {
+        if (e.target !== playCryBtn && !playCryBtn.contains(e.target)) {
+            answerInput.focus();
+        }
+    });
+});
+</script>
+{% endblock %}
