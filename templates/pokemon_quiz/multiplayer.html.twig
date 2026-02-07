@@ -168,6 +168,28 @@
     .activity-item.hint { color: #6366f1; }
     .activity-item.join { color: #4ECDC4; }
 
+    /* Streak display */
+    .player-streak {
+        font-size: 0.7rem;
+        color: #f59e0b;
+        margin-left: 4px;
+    }
+
+    /* Similar cries warning */
+    .similarity-warning {
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid #ef4444;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        color: #fca5a5;
+    }
+
+    .similarity-warning strong {
+        color: #ef4444;
+    }
+
     /* Timer */
     .timer {
         font-size: 1.5rem;
@@ -768,6 +790,7 @@
 
         <!-- Game Section (when started) -->
         <section class="game-section" id="game-section" style="display: none;">
+            <div class="similarity-warning" id="similarity-warning" style="display: none;"></div>
             <div class="controls-row">
                 <div class="control-group">
                     <span id="volume-icon">&#128266;</span>
@@ -805,7 +828,7 @@
             <h2 class="collection-title">Collection</h2>
             <div class="pokemon-grid" id="pokemon-grid">
                 {% for id, pokemon in pokemonData %}
-                <div class="pokemon-slot" data-id="{{ id }}">
+                <div class="pokemon-slot" data-id="{{ id }}" title="#{{ id }}">
                     <svg class="pokeball-icon" viewBox="0 0 100 100">
                         <circle cx="50" cy="50" r="48" fill="#333" stroke="#555" stroke-width="3"/>
                         <path d="M2 50 H98" stroke="#555" stroke-width="3"/>
@@ -985,12 +1008,46 @@ document.addEventListener('DOMContentLoaded', function() {
         if (state.currentPokemonId !== currentPokemonId) {
             currentPokemonId = state.currentPokemonId;
             hintUsedForCurrent = false;
-            hintBtn.disabled = false;
             typeBadges.innerHTML = '';
             revealAnswer.classList.remove('active');
             if (currentPokemonId) {
                 loadCry(currentPokemonId);
             }
+        }
+
+        // Handle shared hint display
+        if (state.currentHint && state.currentHint.length > 0) {
+            hintUsedForCurrent = true;
+            hintBtn.disabled = true;
+            typeBadges.innerHTML = state.currentHint.map(type => {
+                const cls = 'type-' + type.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                return `<span class="type-badge ${cls}">${escapeHtml(type)}</span>`;
+            }).join('');
+        } else {
+            hintBtn.disabled = hintUsedForCurrent;
+        }
+
+        // Handle skipped pokemon name display (synchronized)
+        if (state.lastSkippedPokemonName && state.lastSkippedAt) {
+            const skippedAt = new Date(state.lastSkippedAt);
+            const now = new Date();
+            const diffSeconds = (now.getTime() - skippedAt.getTime()) / 1000;
+            if (diffSeconds <= 3) {
+                revealName.textContent = state.lastSkippedPokemonName;
+                revealAnswer.classList.add('active');
+            } else {
+                revealAnswer.classList.remove('active');
+            }
+        }
+
+        // Handle similar cries warning
+        const similarityWarning = document.getElementById('similarity-warning');
+        if (state.similarCries && state.similarCries.length > 0) {
+            const names = state.similarCries.map(s => s.name).join(', ');
+            similarityWarning.innerHTML = `<strong>Attention :</strong> Ce cri ressemble a : ${names}`;
+            similarityWarning.style.display = 'block';
+        } else {
+            similarityWarning.style.display = 'none';
         }
 
         // Update found pokemon
@@ -1021,13 +1078,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updatePlayersList(players) {
+        cachedPlayers = players; // Cache for getPlayerById
         playerCountEl.textContent = players.length;
+        // Players are already sorted by points from backend
         playersList.innerHTML = players.map(p => `
             <div class="player-item">
                 <span class="player-color" style="background: ${p.color}"></span>
                 <span class="player-name ${p.id === playerId ? 'is-you' : ''}">${escapeHtml(p.name)}</span>
                 ${p.isHost ? '<span class="host-badge">HOTE</span>' : ''}
-                <span class="player-score">${p.score}</span>
+                <span class="player-score">${p.points}${p.streak >= 2 ? '<span class="player-streak">x' + p.streak + '</span>' : ''}</span>
             </div>
         `).join('');
     }
@@ -1047,7 +1106,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const slot = pokemonGrid.querySelector(`.pokemon-slot[data-id="${pokemonId}"]`);
         if (slot && !slot.classList.contains('found')) {
             slot.classList.add('found');
-            slot.title = pokemonName;
+            slot.title = `#${pokemonId} - ${pokemonName}`;
 
             const sprite = slot.querySelector('.pokemon-sprite');
             if (sprite && sprite.dataset.src) {
@@ -1063,9 +1122,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    let cachedPlayers = [];
+
     function getPlayerById(id) {
-        // Get from current players list in DOM
-        return { color: playerColor }; // Simplified, will be updated on next poll
+        const player = cachedPlayers.find(p => p.id === id);
+        return player || { color: playerColor };
     }
 
     function showVictory(state) {
@@ -1118,7 +1179,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentPokemonId) loadCry(currentPokemonId);
     }
 
-    // Hint
+    // Hint (now shared - all players will see via state polling)
     hintBtn.addEventListener('click', () => {
         if (hintUsedForCurrent || !currentPokemonId) return;
         hintUsedForCurrent = true;
@@ -1128,19 +1189,11 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ playerId: playerId })
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.types) {
-                typeBadges.innerHTML = data.types.map(type => {
-                    const cls = 'type-' + type.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-                    return `<span class="type-badge ${cls}">${type}</span>`;
-                }).join('');
-            }
         });
+        // Types will be displayed via state polling (shared hint)
     });
 
-    // Skip
+    // Skip (name reveal is now synchronized via state polling for 3 seconds)
     skipBtn.addEventListener('click', () => {
         if (!currentPokemonId) return;
 
@@ -1148,17 +1201,8 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ playerId: playerId })
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.skippedPokemonName) {
-                revealName.textContent = data.skippedPokemonName;
-                revealAnswer.classList.add('active');
-                setTimeout(() => {
-                    revealAnswer.classList.remove('active');
-                }, 2000);
-            }
         });
+        // Name reveal will be displayed via state polling (synchronized 3 seconds)
     });
 
     // Answer input

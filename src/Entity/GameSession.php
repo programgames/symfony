@@ -57,6 +57,15 @@ class GameSession
     #[ORM\Column(type: 'json')]
     private array $activityLog = [];
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $currentHint = null;
+
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private ?string $lastSkippedPokemonName = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $lastSkippedAt = null;
+
     public function __construct()
     {
         $this->id = $this->generateId();
@@ -282,5 +291,38 @@ class GameSession
         }
         $end = $this->finishedAt ?? new \DateTime();
         return $end->getTimestamp() - $this->startedAt->getTimestamp();
+    }
+
+    public function getCurrentHint(): ?array
+    {
+        return $this->currentHint;
+    }
+
+    public function setCurrentHint(?array $hint): self
+    {
+        $this->currentHint = $hint;
+        return $this;
+    }
+
+    public function getLastSkippedPokemonName(): ?string
+    {
+        return $this->lastSkippedPokemonName;
+    }
+
+    public function setLastSkippedPokemonName(?string $name): self
+    {
+        $this->lastSkippedPokemonName = $name;
+        return $this;
+    }
+
+    public function getLastSkippedAt(): ?\DateTimeInterface
+    {
+        return $this->lastSkippedAt;
+    }
+
+    public function setLastSkippedAt(?\DateTimeInterface $skippedAt): self
+    {
+        $this->lastSkippedAt = $skippedAt;
+        return $this;
     }
 }

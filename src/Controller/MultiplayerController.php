@@ -187,6 +187,7 @@ final class MultiplayerController extends AbstractController
 
         // Start the game
         $session->setIsStarted(true);
+        $session->setStartedAt(new \DateTime());
         $nextPokemon = $session->getNextPokemon();
         $session->setCurrentPokemonId($nextPokemon);
         $session->setUpdatedAt(new \DateTime());
@@ -223,8 +224,32 @@ final class MultiplayerController extends AbstractController
             $players[] = $player->toArray();
         }
 
-        // Sort players by score
-        usort($players, fn($a, $b) => $b['score'] - $a['score']);
+        // Sort players by points (new point system)
+        usort($players, fn($a, $b) => $b['points'] - $a['points']);
+
+        // Prepare last skipped info (only if within 3 seconds)
+        $lastSkippedPokemonName = null;
+        $lastSkippedAt = $session->getLastSkippedAt();
+        if ($lastSkippedAt !== null) {
+            $now = new \DateTime();
+            $diff = $now->getTimestamp() - $lastSkippedAt->getTimestamp();
+            if ($diff <= 3) {
+                $lastSkippedPokemonName = $session->getLastSkippedPokemonName();
+            }
+        }
+
+        // Load similar cries data
+        $similarCries = null;
+        $currentPokemonId = $session->getCurrentPokemonId();
+        if ($currentPokemonId !== null) {
+            $similarCriesPath = __DIR__ . '/../../data/similar_cries.json';
+            if (file_exists($similarCriesPath)) {
+                $allSimilarCries = json_decode(file_get_contents($similarCriesPath), true);
+                if (isset($allSimilarCries[$currentPokemonId])) {
+                    $similarCries = $allSimilarCries[$currentPokemonId];
+                }
+            }
+        }
 
         return new JsonResponse([
             'isStarted' => $session->isStarted(),
@@ -237,6 +262,10 @@ final class MultiplayerController extends AbstractController
             'totalSkipsUsed' => $session->getTotalSkipsUsed(),
             'elapsedTime' => $session->getElapsedTime(),
             'updatedAt' => $session->getUpdatedAt()->format('c'),
+            'currentHint' => $session->getCurrentHint(),
+            'lastSkippedPokemonName' => $lastSkippedPokemonName,
+            'lastSkippedAt' => $lastSkippedAt?->format('c'),
+            'similarCries' => $similarCries,
         ]);
     }
 
@@ -280,17 +309,20 @@ final class MultiplayerController extends AbstractController
         if ($isCorrect) {
             $pokemonName = PokemonData::getPokemonName($currentPokemonId);
 
-            // Start timer on first found pokemon
-            if (!$session->getStartedAt()) {
-                $session->setStartedAt(new \DateTime());
-            }
-
             // Update session
             $session->addFoundPokemon($currentPokemonId, $playerId, $pokemonName);
             $session->addActivity('found', $playerId, $player->getName(), $pokemonName);
 
-            // Update player score
+            // Update player score and points
             $player->incrementScore();
+            $player->incrementStreak();
+            $bonus = $player->calculateStreakBonus();
+            $player->addPoints(Player::POINTS_CORRECT_ANSWER + $bonus);
+
+            // Reset hint for next pokemon
+            $session->setCurrentHint(null);
+            $session->setLastSkippedPokemonName(null);
+            $session->setLastSkippedAt(null);
 
             // Get next pokemon or finish
             $nextPokemon = $session->getNextPokemon();
@@ -311,6 +343,8 @@ final class MultiplayerController extends AbstractController
                 'pokemonId' => $currentPokemonId,
                 'nextPokemonId' => $nextPokemon,
                 'isFinished' => $session->isFinished(),
+                'pointsAwarded' => Player::POINTS_CORRECT_ANSWER + $bonus,
+                'streakBonus' => $bonus,
             ]);
         }
 
@@ -328,6 +362,10 @@ final class MultiplayerController extends AbstractController
             return new JsonResponse(['error' => 'Partie introuvable'], 404);
         }
 
+        if (!$session->isStarted() || $session->isFinished()) {
+            return new JsonResponse(['error' => 'Partie non active'], 400);
+        }
+
         // Find player
         $player = null;
         foreach ($session->getPlayers() as $p) {
@@ -337,16 +375,18 @@ final class MultiplayerController extends AbstractController
             }
         }
 
+        $currentPokemonId = $session->getCurrentPokemonId();
+        $types = $currentPokemonId ? PokemonData::getPokemonTypesTranslated($currentPokemonId) : [];
+
         if ($player) {
             $player->incrementHintsUsed();
+            $player->addPoints(Player::POINTS_HINT_PENALTY);
             $session->incrementHintsUsed();
+            $session->setCurrentHint($types);
             $session->addActivity('hint', $playerId, $player->getName());
             $session->setUpdatedAt(new \DateTime());
             $this->em->flush();
         }
-
-        $currentPokemonId = $session->getCurrentPokemonId();
-        $types = $currentPokemonId ? PokemonData::getPokemonTypesTranslated($currentPokemonId) : [];
 
         return new JsonResponse([
             'success' => true,
@@ -383,9 +423,18 @@ final class MultiplayerController extends AbstractController
 
         if ($player) {
             $player->incrementSkipsUsed();
+            $player->addPoints(Player::POINTS_SKIP_PENALTY);
+            $player->resetStreak();
             $session->incrementSkipsUsed();
             $session->addActivity('skip', $playerId, $player->getName(), $pokemonName);
         }
+
+        // Store the skipped pokemon info for all players to see (3 seconds)
+        $session->setLastSkippedPokemonName($pokemonName);
+        $session->setLastSkippedAt(new \DateTime());
+
+        // Reset hint for next pokemon
+        $session->setCurrentHint(null);
 
         // Remove from remaining without adding to found
         $remaining = array_filter(
