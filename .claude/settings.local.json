@@ -19,7 +19,12 @@
       "Bash(php bin/console dbal:run-sql:*)",
       "Bash(php bin/console:*)",
       "Bash(php:*)",
-      "Bash(php -l:*)"
+      "Bash(php -l:*)",
+      "Bash(python3:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker port:*)",
+      "Bash(docker restart:*)"
     ]
   }
 }
