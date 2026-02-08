@@ -358,3 +358,51 @@ prod-pokemon-analyze-cries: ## Analyser les cris Pokemon (production Docker)
 .PHONY: dev-pokemon-analyze-cries
 dev-pokemon-analyze-cries: ## Analyser les cris Pokemon (developpement Docker)
 	$(DOCKER_COMPOSE_DEV) exec $(PHP_SERVICE) php bin/console pokemon:analyze-cries
+
+.PHONY: pokemon-download-cries
+pokemon-download-cries: ## Telecharger tous les sons Pokemon (local)
+	php bin/console pokemon:download-cries
+
+.PHONY: prod-pokemon-download-cries
+prod-pokemon-download-cries: ## Telecharger tous les sons Pokemon (production Docker)
+	$(DOCKER_COMPOSE_PROD) exec $(PHP_SERVICE) php bin/console pokemon:download-cries
+
+.PHONY: dev-pokemon-download-cries
+dev-pokemon-download-cries: ## Telecharger tous les sons Pokemon (developpement Docker)
+	$(DOCKER_COMPOSE_DEV) exec $(PHP_SERVICE) php bin/console pokemon:download-cries
+
+.PHONY: pokemon-generate-data
+pokemon-generate-data: ## Generer les donnees Pokemon depuis PokeAPI (local)
+	php bin/console pokemon:generate-data
+
+.PHONY: prod-pokemon-generate-data
+prod-pokemon-generate-data: ## Generer les donnees Pokemon depuis PokeAPI (production Docker)
+	$(DOCKER_COMPOSE_PROD) exec $(PHP_SERVICE) php bin/console pokemon:generate-data
+
+.PHONY: dev-pokemon-generate-data
+dev-pokemon-generate-data: ## Generer les donnees Pokemon depuis PokeAPI (developpement Docker)
+	$(DOCKER_COMPOSE_DEV) exec $(PHP_SERVICE) php bin/console pokemon:generate-data
+
+.PHONY: pokemon-download-sprites
+pokemon-download-sprites: ## Telecharger toutes les images Pokemon (local)
+	php bin/console pokemon:download-sprites
+
+.PHONY: prod-pokemon-download-sprites
+prod-pokemon-download-sprites: ## Telecharger toutes les images Pokemon (production Docker)
+	$(DOCKER_COMPOSE_PROD) exec $(PHP_SERVICE) php bin/console pokemon:download-sprites
+
+.PHONY: dev-pokemon-download-sprites
+dev-pokemon-download-sprites: ## Telecharger toutes les images Pokemon (developpement Docker)
+	$(DOCKER_COMPOSE_DEV) exec $(PHP_SERVICE) php bin/console pokemon:download-sprites
+
+.PHONY: pokemon-setup
+pokemon-setup: pokemon-generate-data pokemon-download-cries pokemon-download-sprites ## Setup complet Pokemon: donnees + sons + images (local)
+	@echo "$(COLOR_SUCCESS)✓ Setup Pokemon terminé !$(COLOR_RESET)"
+
+.PHONY: prod-pokemon-setup
+prod-pokemon-setup: prod-pokemon-generate-data prod-pokemon-download-cries prod-pokemon-download-sprites ## Setup complet Pokemon (production Docker)
+	@echo "$(COLOR_SUCCESS)✓ Setup Pokemon terminé en production !$(COLOR_RESET)"
+
+.PHONY: dev-pokemon-setup
+dev-pokemon-setup: dev-pokemon-generate-data dev-pokemon-download-cries dev-pokemon-download-sprites ## Setup complet Pokemon (developpement Docker)
+	@echo "$(COLOR_SUCCESS)✓ Setup Pokemon terminé en dev !$(COLOR_RESET)"

@@ -410,6 +410,28 @@
 
     .hint-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+    .hint-btn.hint-shape {
+        background: linear-gradient(145deg, #8b5cf6, #7c3aed);
+    }
+
+    .silhouette-container {
+        display: none;
+        justify-content: center;
+        margin: 0.5rem 0;
+    }
+
+    .silhouette-container.active {
+        display: flex;
+    }
+
+    .silhouette-img {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        filter: brightness(0) saturate(100%);
+        opacity: 0.8;
+    }
+
     .skip-btn {
         background: linear-gradient(145deg, #ef4444, #dc2626);
         border: none;
@@ -808,12 +830,16 @@
                 <button class="play-cry-btn" id="play-cry-btn">
                     <span>&#128266;</span> Ecouter
                 </button>
-                <button class="hint-btn" id="hint-btn">Indice</button>
+                <button class="hint-btn" id="hint-btn">Indice (types)</button>
+                <button class="hint-btn hint-shape" id="hint-shape-btn">Indice (forme)</button>
                 <button class="skip-btn" id="skip-btn">Passer</button>
             </div>
 
             <div class="hint-display" id="hint-display">
                 <div class="type-badges" id="type-badges"></div>
+                <div class="silhouette-container" id="silhouette-container">
+                    <img class="silhouette-img" id="silhouette-img" src="" alt="Silhouette">
+                </div>
                 <div class="reveal-answer" id="reveal-answer">
                     <div style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">C'etait...</div>
                     <div class="reveal-name" id="reveal-name"></div>
@@ -861,6 +887,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let cryVersion = 'latest';
     let isPlaying = false;
     let hintUsedForCurrent = false;
+    let shapeHintUsedForCurrent = false;
     let lastUpdatedAt = null;
     let pollInterval = null;
 
@@ -883,8 +910,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const pokemonGrid = document.getElementById('pokemon-grid');
     const playCryBtn = document.getElementById('play-cry-btn');
     const hintBtn = document.getElementById('hint-btn');
+    const hintShapeBtn = document.getElementById('hint-shape-btn');
     const skipBtn = document.getElementById('skip-btn');
     const typeBadges = document.getElementById('type-badges');
+    const silhouetteContainer = document.getElementById('silhouette-container');
+    const silhouetteImg = document.getElementById('silhouette-img');
     const revealAnswer = document.getElementById('reveal-answer');
     const revealName = document.getElementById('reveal-name');
     const answerInput = document.getElementById('answer-input');
@@ -1008,14 +1038,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if (state.currentPokemonId !== currentPokemonId) {
             currentPokemonId = state.currentPokemonId;
             hintUsedForCurrent = false;
+            shapeHintUsedForCurrent = false;
             typeBadges.innerHTML = '';
+            silhouetteContainer.classList.remove('active');
+            silhouetteImg.src = '';
             revealAnswer.classList.remove('active');
             if (currentPokemonId) {
                 loadCry(currentPokemonId);
             }
         }
 
-        // Handle shared hint display
+        // Handle shared hint display (types)
         if (state.currentHint && state.currentHint.length > 0) {
             hintUsedForCurrent = true;
             hintBtn.disabled = true;
@@ -1025,6 +1058,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }).join('');
         } else {
             hintBtn.disabled = hintUsedForCurrent;
+        }
+
+        // Handle shared shape hint display
+        if (state.shapeHintUsed && currentPokemonId) {
+            shapeHintUsedForCurrent = true;
+            hintShapeBtn.disabled = true;
+            silhouetteImg.src = '/images/pokemon/' + currentPokemonId + '.png';
+            silhouetteContainer.classList.add('active');
+        } else {
+            hintShapeBtn.disabled = shapeHintUsedForCurrent;
         }
 
         // Handle skipped pokemon name display (synchronized)
@@ -1096,7 +1139,8 @@ document.addEventListener('DOMContentLoaded', function() {
             let text = '';
             if (a.type === 'found') text = `<b>${escapeHtml(a.playerName)}</b> a trouve ${a.pokemonName}`;
             else if (a.type === 'skip') text = `<b>${escapeHtml(a.playerName)}</b> a passe`;
-            else if (a.type === 'hint') text = `<b>${escapeHtml(a.playerName)}</b> a utilise un indice`;
+            else if (a.type === 'hint') text = `<b>${escapeHtml(a.playerName)}</b> a utilise l'indice types`;
+            else if (a.type === 'hint_shape') text = `<b>${escapeHtml(a.playerName)}</b> a utilise l'indice forme`;
             else if (a.type === 'join') text = `<b>${escapeHtml(a.playerName)}</b> a rejoint`;
             return `<div class="activity-item ${a.type}">${text}</div>`;
         }).join('');
@@ -1179,7 +1223,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentPokemonId) loadCry(currentPokemonId);
     }
 
-    // Hint (now shared - all players will see via state polling)
+    // Hint types (now shared - all players will see via state polling)
     hintBtn.addEventListener('click', () => {
         if (hintUsedForCurrent || !currentPokemonId) return;
         hintUsedForCurrent = true;
@@ -1191,6 +1235,20 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify({ playerId: playerId })
         });
         // Types will be displayed via state polling (shared hint)
+    });
+
+    // Hint shape (silhouette - now shared)
+    hintShapeBtn.addEventListener('click', () => {
+        if (shapeHintUsedForCurrent || !currentPokemonId) return;
+        shapeHintUsedForCurrent = true;
+        hintShapeBtn.disabled = true;
+
+        fetch('/pokemon-quiz/multiplayer/hint-shape/' + sessionId, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ playerId: playerId })
+        });
+        // Silhouette will be displayed via state polling (shared hint)
     });
 
     // Skip (name reveal is now synchronized via state polling for 3 seconds)

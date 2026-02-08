@@ -246,18 +246,17 @@
         font-size: 1.5rem;
     }
 
-    /* Hint Button */
+    /* Hint Buttons */
     .hint-btn {
         background: linear-gradient(145deg, #6366f1, #4f46e5);
         border: none;
         color: white;
         padding: 0.75rem 1.5rem;
-        font-size: 1rem;
+        font-size: 0.9rem;
         font-weight: bold;
         border-radius: 50px;
         cursor: pointer;
         transition: all 0.3s ease;
-        margin-left: 1rem;
         box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
     }
 
@@ -270,6 +269,34 @@
         opacity: 0.5;
         cursor: not-allowed;
         transform: none;
+    }
+
+    .hint-btn.hint-shape {
+        background: linear-gradient(145deg, #8b5cf6, #7c3aed);
+        box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+    }
+
+    .hint-btn.hint-shape:hover {
+        box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+    }
+
+    /* Silhouette display */
+    .silhouette-container {
+        display: none;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .silhouette-container.active {
+        display: flex;
+    }
+
+    .silhouette-img {
+        width: 120px;
+        height: 120px;
+        object-fit: contain;
+        filter: brightness(0) saturate(100%);
+        opacity: 0.8;
     }
 
     /* Skip Button */
@@ -624,7 +651,10 @@
                     Ecouter le cri
                 </button>
                 <button class="hint-btn" id="hint-btn">
-                    Indice
+                    Indice (types)
+                </button>
+                <button class="hint-btn hint-shape" id="hint-shape-btn">
+                    Indice (forme)
                 </button>
                 <button class="skip-btn" id="skip-btn">
                     Passer
@@ -633,6 +663,9 @@
 
             <div class="hint-display" id="hint-display">
                 <div class="type-badges" id="type-badges"></div>
+                <div class="silhouette-container" id="silhouette-container">
+                    <img class="silhouette-img" id="silhouette-img" src="" alt="Silhouette">
+                </div>
                 <div class="reveal-answer" id="reveal-answer">
                     <div class="reveal-label">C'etait...</div>
                     <div class="reveal-name" id="reveal-name"></div>
@@ -699,6 +732,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPokemonId = null;
     let isPlaying = false;
     let hintUsed = false;
+    let shapeHintUsed = false;
     let cryVersion = 'latest'; // 'latest' or 'legacy'
 
     // DOM elements
@@ -707,7 +741,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const startBtn = document.getElementById('start-btn');
     const playCryBtn = document.getElementById('play-cry-btn');
     const hintBtn = document.getElementById('hint-btn');
+    const hintShapeBtn = document.getElementById('hint-shape-btn');
     const typeBadges = document.getElementById('type-badges');
+    const silhouetteContainer = document.getElementById('silhouette-container');
+    const silhouetteImg = document.getElementById('silhouette-img');
     const answerInput = document.getElementById('answer-input');
     const progressBar = document.getElementById('progress-bar');
     const progressCount = document.getElementById('progress-count');
@@ -772,7 +809,8 @@ document.addEventListener('DOMContentLoaded', function() {
         audio.pause();
         audio.currentTime = 0;
 
-        const cryUrl = `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/${cryVersion}/${pokemonId}.ogg`;
+        // Use local files (downloaded via pokemon:download-cries command)
+        const cryUrl = `/audio/pokemon/${cryVersion}/${pokemonId}.ogg`;
         audio.src = cryUrl;
         audio.load();
     }
@@ -847,11 +885,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Reset hint for new Pokemon
+    // Show shape hint (silhouette)
+    function showShapeHint() {
+        if (!currentPokemonId || shapeHintUsed) return;
+
+        shapeHintUsed = true;
+        hintShapeBtn.disabled = true;
+
+        // Use local sprite image
+        silhouetteImg.src = '/images/pokemon/' + currentPokemonId + '.png';
+        silhouetteContainer.classList.add('active');
+    }
+
+    // Reset hints for new Pokemon
     function resetHint() {
         hintUsed = false;
+        shapeHintUsed = false;
         hintBtn.disabled = false;
+        hintShapeBtn.disabled = false;
         typeBadges.innerHTML = '';
+        silhouetteContainer.classList.remove('active');
+        silhouetteImg.src = '';
         revealAnswer.classList.remove('active');
     }
 
@@ -969,6 +1023,8 @@ document.addEventListener('DOMContentLoaded', function() {
     playCryBtn.addEventListener('click', playCry);
 
     hintBtn.addEventListener('click', showHint);
+
+    hintShapeBtn.addEventListener('click', showShapeHint);
 
     skipBtn.addEventListener('click', skipPokemon);
 

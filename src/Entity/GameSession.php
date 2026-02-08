@@ -60,6 +60,9 @@ class GameSession
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $currentHint = null;
 
+    #[ORM\Column(type: 'boolean')]
+    private bool $shapeHintUsed = false;
+
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private ?string $lastSkippedPokemonName = null;
 
@@ -301,6 +304,17 @@ class GameSession
     public function setCurrentHint(?array $hint): self
     {
         $this->currentHint = $hint;
+        return $this;
+    }
+
+    public function isShapeHintUsed(): bool
+    {
+        return $this->shapeHintUsed;
+    }
+
+    public function setShapeHintUsed(bool $used): self
+    {
+        $this->shapeHintUsed = $used;
         return $this;
     }
 

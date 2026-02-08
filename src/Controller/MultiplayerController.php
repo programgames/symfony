@@ -263,6 +263,7 @@ final class MultiplayerController extends AbstractController
             'elapsedTime' => $session->getElapsedTime(),
             'updatedAt' => $session->getUpdatedAt()->format('c'),
             'currentHint' => $session->getCurrentHint(),
+            'shapeHintUsed' => $session->isShapeHintUsed(),
             'lastSkippedPokemonName' => $lastSkippedPokemonName,
             'lastSkippedAt' => $lastSkippedAt?->format('c'),
             'similarCries' => $similarCries,
@@ -319,8 +320,9 @@ final class MultiplayerController extends AbstractController
             $bonus = $player->calculateStreakBonus();
             $player->addPoints(Player::POINTS_CORRECT_ANSWER + $bonus);
 
-            // Reset hint for next pokemon
+            // Reset hints for next pokemon
             $session->setCurrentHint(null);
+            $session->setShapeHintUsed(false);
             $session->setLastSkippedPokemonName(null);
             $session->setLastSkippedAt(null);
 
@@ -433,8 +435,9 @@ final class MultiplayerController extends AbstractController
         $session->setLastSkippedPokemonName($pokemonName);
         $session->setLastSkippedAt(new \DateTime());
 
-        // Reset hint for next pokemon
+        // Reset hints for next pokemon
         $session->setCurrentHint(null);
+        $session->setShapeHintUsed(false);
 
         // Remove from remaining without adding to found
         $remaining = array_filter(
@@ -462,6 +465,48 @@ final class MultiplayerController extends AbstractController
             'skippedPokemonName' => $pokemonName,
             'nextPokemonId' => $nextPokemon,
             'isFinished' => $session->isFinished(),
+        ]);
+    }
+
+    #[Route('/hint-shape/{sessionId}', name: 'hint_shape', methods: ['POST'])]
+    public function hintShape(string $sessionId, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $playerId = $data['playerId'] ?? '';
+
+        $session = $this->gameSessionRepository->find($sessionId);
+        if (!$session) {
+            return new JsonResponse(['error' => 'Partie introuvable'], 404);
+        }
+
+        if (!$session->isStarted() || $session->isFinished()) {
+            return new JsonResponse(['error' => 'Partie non active'], 400);
+        }
+
+        // Find player
+        $player = null;
+        foreach ($session->getPlayers() as $p) {
+            if ($p->getId() === $playerId) {
+                $player = $p;
+                break;
+            }
+        }
+
+        $currentPokemonId = $session->getCurrentPokemonId();
+
+        if ($player && $currentPokemonId) {
+            $player->incrementHintsUsed();
+            $player->addPoints(Player::POINTS_HINT_PENALTY);
+            $session->incrementHintsUsed();
+            $session->setShapeHintUsed(true);
+            $session->addActivity('hint_shape', $playerId, $player->getName());
+            $session->setUpdatedAt(new \DateTime());
+            $this->em->flush();
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'pokemonId' => $currentPokemonId,
         ]);
     }
 }

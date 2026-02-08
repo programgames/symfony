@@ -4,7 +4,7 @@ namespace App\Pokemon;
 
 /**
  * Pokemon data organized by generation
- * Names are stored by language code for future i18n support
+ * Names and types are loaded from JSON files for all generations
  */
 final class PokemonData
 {
@@ -18,165 +18,6 @@ final class PokemonData
         7 => ['name' => 'Generation VII', 'range' => [722, 809]],
         8 => ['name' => 'Generation VIII', 'range' => [810, 905]],
         9 => ['name' => 'Generation IX', 'range' => [906, 1025]],
-    ];
-
-    /**
-     * Pokemon names by language
-     * Key: Pokemon ID, Value: array of names by language code
-     */
-    private const NAMES = [
-        // Generation 1 (1-151)
-        1 => ['fr' => 'Bulbizarre', 'en' => 'Bulbasaur'],
-        2 => ['fr' => 'Herbizarre', 'en' => 'Ivysaur'],
-        3 => ['fr' => 'Florizarre', 'en' => 'Venusaur'],
-        4 => ['fr' => 'Salamèche', 'en' => 'Charmander'],
-        5 => ['fr' => 'Reptincel', 'en' => 'Charmeleon'],
-        6 => ['fr' => 'Dracaufeu', 'en' => 'Charizard'],
-        7 => ['fr' => 'Carapuce', 'en' => 'Squirtle'],
-        8 => ['fr' => 'Carabaffe', 'en' => 'Wartortle'],
-        9 => ['fr' => 'Tortank', 'en' => 'Blastoise'],
-        10 => ['fr' => 'Chenipan', 'en' => 'Caterpie'],
-        11 => ['fr' => 'Chrysacier', 'en' => 'Metapod'],
-        12 => ['fr' => 'Papilusion', 'en' => 'Butterfree'],
-        13 => ['fr' => 'Aspicot', 'en' => 'Weedle'],
-        14 => ['fr' => 'Coconfort', 'en' => 'Kakuna'],
-        15 => ['fr' => 'Dardargnan', 'en' => 'Beedrill'],
-        16 => ['fr' => 'Roucool', 'en' => 'Pidgey'],
-        17 => ['fr' => 'Roucoups', 'en' => 'Pidgeotto'],
-        18 => ['fr' => 'Roucarnage', 'en' => 'Pidgeot'],
-        19 => ['fr' => 'Rattata', 'en' => 'Rattata'],
-        20 => ['fr' => 'Rattatac', 'en' => 'Raticate'],
-        21 => ['fr' => 'Piafabec', 'en' => 'Spearow'],
-        22 => ['fr' => 'Rapasdepic', 'en' => 'Fearow'],
-        23 => ['fr' => 'Abo', 'en' => 'Ekans'],
-        24 => ['fr' => 'Arbok', 'en' => 'Arbok'],
-        25 => ['fr' => 'Pikachu', 'en' => 'Pikachu'],
-        26 => ['fr' => 'Raichu', 'en' => 'Raichu'],
-        27 => ['fr' => 'Sabelette', 'en' => 'Sandshrew'],
-        28 => ['fr' => 'Sablaireau', 'en' => 'Sandslash'],
-        29 => ['fr' => 'Nidoran♀', 'en' => 'Nidoran♀'],
-        30 => ['fr' => 'Nidorina', 'en' => 'Nidorina'],
-        31 => ['fr' => 'Nidoqueen', 'en' => 'Nidoqueen'],
-        32 => ['fr' => 'Nidoran♂', 'en' => 'Nidoran♂'],
-        33 => ['fr' => 'Nidorino', 'en' => 'Nidorino'],
-        34 => ['fr' => 'Nidoking', 'en' => 'Nidoking'],
-        35 => ['fr' => 'Mélofée', 'en' => 'Clefairy'],
-        36 => ['fr' => 'Mélodelfe', 'en' => 'Clefable'],
-        37 => ['fr' => 'Goupix', 'en' => 'Vulpix'],
-        38 => ['fr' => 'Feunard', 'en' => 'Ninetales'],
-        39 => ['fr' => 'Rondoudou', 'en' => 'Jigglypuff'],
-        40 => ['fr' => 'Grodoudou', 'en' => 'Wigglytuff'],
-        41 => ['fr' => 'Nosferapti', 'en' => 'Zubat'],
-        42 => ['fr' => 'Nosferalto', 'en' => 'Golbat'],
-        43 => ['fr' => 'Mystherbe', 'en' => 'Oddish'],
-        44 => ['fr' => 'Ortide', 'en' => 'Gloom'],
-        45 => ['fr' => 'Rafflesia', 'en' => 'Vileplume'],
-        46 => ['fr' => 'Paras', 'en' => 'Paras'],
-        47 => ['fr' => 'Parasect', 'en' => 'Parasect'],
-        48 => ['fr' => 'Mimitoss', 'en' => 'Venonat'],
-        49 => ['fr' => 'Aéromite', 'en' => 'Venomoth'],
-        50 => ['fr' => 'Taupiqueur', 'en' => 'Diglett'],
-        51 => ['fr' => 'Triopikeur', 'en' => 'Dugtrio'],
-        52 => ['fr' => 'Miaouss', 'en' => 'Meowth'],
-        53 => ['fr' => 'Persian', 'en' => 'Persian'],
-        54 => ['fr' => 'Psykokwak', 'en' => 'Psyduck'],
-        55 => ['fr' => 'Akwakwak', 'en' => 'Golduck'],
-        56 => ['fr' => 'Férosinge', 'en' => 'Mankey'],
-        57 => ['fr' => 'Colossinge', 'en' => 'Primeape'],
-        58 => ['fr' => 'Caninos', 'en' => 'Growlithe'],
-        59 => ['fr' => 'Arcanin', 'en' => 'Arcanine'],
-        60 => ['fr' => 'Ptitard', 'en' => 'Poliwag'],
-        61 => ['fr' => 'Têtarte', 'en' => 'Poliwhirl'],
-        62 => ['fr' => 'Tartard', 'en' => 'Poliwrath'],
-        63 => ['fr' => 'Abra', 'en' => 'Abra'],
-        64 => ['fr' => 'Kadabra', 'en' => 'Kadabra'],
-        65 => ['fr' => 'Alakazam', 'en' => 'Alakazam'],
-        66 => ['fr' => 'Machoc', 'en' => 'Machop'],
-        67 => ['fr' => 'Machopeur', 'en' => 'Machoke'],
-        68 => ['fr' => 'Mackogneur', 'en' => 'Machamp'],
-        69 => ['fr' => 'Chétiflor', 'en' => 'Bellsprout'],
-        70 => ['fr' => 'Boustiflor', 'en' => 'Weepinbell'],
-        71 => ['fr' => 'Empiflor', 'en' => 'Victreebel'],
-        72 => ['fr' => 'Tentacool', 'en' => 'Tentacool'],
-        73 => ['fr' => 'Tentacruel', 'en' => 'Tentacruel'],
-        74 => ['fr' => 'Racaillou', 'en' => 'Geodude'],
-        75 => ['fr' => 'Gravalanch', 'en' => 'Graveler'],
-        76 => ['fr' => 'Grolem', 'en' => 'Golem'],
-        77 => ['fr' => 'Ponyta', 'en' => 'Ponyta'],
-        78 => ['fr' => 'Galopa', 'en' => 'Rapidash'],
-        79 => ['fr' => 'Ramoloss', 'en' => 'Slowpoke'],
-        80 => ['fr' => 'Flagadoss', 'en' => 'Slowbro'],
-        81 => ['fr' => 'Magnéti', 'en' => 'Magnemite'],
-        82 => ['fr' => 'Magnéton', 'en' => 'Magneton'],
-        83 => ['fr' => 'Canarticho', 'en' => 'Farfetch\'d'],
-        84 => ['fr' => 'Doduo', 'en' => 'Doduo'],
-        85 => ['fr' => 'Dodrio', 'en' => 'Dodrio'],
-        86 => ['fr' => 'Otaria', 'en' => 'Seel'],
-        87 => ['fr' => 'Lamantine', 'en' => 'Dewgong'],
-        88 => ['fr' => 'Tadmorv', 'en' => 'Grimer'],
-        89 => ['fr' => 'Grotadmorv', 'en' => 'Muk'],
-        90 => ['fr' => 'Kokiyas', 'en' => 'Shellder'],
-        91 => ['fr' => 'Crustabri', 'en' => 'Cloyster'],
-        92 => ['fr' => 'Fantominus', 'en' => 'Gastly'],
-        93 => ['fr' => 'Spectrum', 'en' => 'Haunter'],
-        94 => ['fr' => 'Ectoplasma', 'en' => 'Gengar'],
-        95 => ['fr' => 'Onix', 'en' => 'Onix'],
-        96 => ['fr' => 'Soporifik', 'en' => 'Drowzee'],
-        97 => ['fr' => 'Hypnomade', 'en' => 'Hypno'],
-        98 => ['fr' => 'Krabby', 'en' => 'Krabby'],
-        99 => ['fr' => 'Krabboss', 'en' => 'Kingler'],
-        100 => ['fr' => 'Voltorbe', 'en' => 'Voltorb'],
-        101 => ['fr' => 'Électrode', 'en' => 'Electrode'],
-        102 => ['fr' => 'Noeunoeuf', 'en' => 'Exeggcute'],
-        103 => ['fr' => 'Noadkoko', 'en' => 'Exeggutor'],
-        104 => ['fr' => 'Osselait', 'en' => 'Cubone'],
-        105 => ['fr' => 'Ossatueur', 'en' => 'Marowak'],
-        106 => ['fr' => 'Kicklee', 'en' => 'Hitmonlee'],
-        107 => ['fr' => 'Tygnon', 'en' => 'Hitmonchan'],
-        108 => ['fr' => 'Excelangue', 'en' => 'Lickitung'],
-        109 => ['fr' => 'Smogo', 'en' => 'Koffing'],
-        110 => ['fr' => 'Smogogo', 'en' => 'Weezing'],
-        111 => ['fr' => 'Rhinocorne', 'en' => 'Rhyhorn'],
-        112 => ['fr' => 'Rhinoféros', 'en' => 'Rhydon'],
-        113 => ['fr' => 'Leveinard', 'en' => 'Chansey'],
-        114 => ['fr' => 'Saquedeneu', 'en' => 'Tangela'],
-        115 => ['fr' => 'Kangourex', 'en' => 'Kangaskhan'],
-        116 => ['fr' => 'Hypotrempe', 'en' => 'Horsea'],
-        117 => ['fr' => 'Hypocéan', 'en' => 'Seadra'],
-        118 => ['fr' => 'Poissirène', 'en' => 'Goldeen'],
-        119 => ['fr' => 'Poissoroy', 'en' => 'Seaking'],
-        120 => ['fr' => 'Stari', 'en' => 'Staryu'],
-        121 => ['fr' => 'Staross', 'en' => 'Starmie'],
-        122 => ['fr' => 'M. Mime', 'en' => 'Mr. Mime'],
-        123 => ['fr' => 'Insécateur', 'en' => 'Scyther'],
-        124 => ['fr' => 'Lippoutou', 'en' => 'Jynx'],
-        125 => ['fr' => 'Élektek', 'en' => 'Electabuzz'],
-        126 => ['fr' => 'Magmar', 'en' => 'Magmar'],
-        127 => ['fr' => 'Scarabrute', 'en' => 'Pinsir'],
-        128 => ['fr' => 'Tauros', 'en' => 'Tauros'],
-        129 => ['fr' => 'Magicarpe', 'en' => 'Magikarp'],
-        130 => ['fr' => 'Léviator', 'en' => 'Gyarados'],
-        131 => ['fr' => 'Lokhlass', 'en' => 'Lapras'],
-        132 => ['fr' => 'Métamorph', 'en' => 'Ditto'],
-        133 => ['fr' => 'Évoli', 'en' => 'Eevee'],
-        134 => ['fr' => 'Aquali', 'en' => 'Vaporeon'],
-        135 => ['fr' => 'Voltali', 'en' => 'Jolteon'],
-        136 => ['fr' => 'Pyroli', 'en' => 'Flareon'],
-        137 => ['fr' => 'Porygon', 'en' => 'Porygon'],
-        138 => ['fr' => 'Amonita', 'en' => 'Omanyte'],
-        139 => ['fr' => 'Amonistar', 'en' => 'Omastar'],
-        140 => ['fr' => 'Kabuto', 'en' => 'Kabuto'],
-        141 => ['fr' => 'Kabutops', 'en' => 'Kabutops'],
-        142 => ['fr' => 'Ptéra', 'en' => 'Aerodactyl'],
-        143 => ['fr' => 'Ronflex', 'en' => 'Snorlax'],
-        144 => ['fr' => 'Artikodin', 'en' => 'Articuno'],
-        145 => ['fr' => 'Électhor', 'en' => 'Zapdos'],
-        146 => ['fr' => 'Sulfura', 'en' => 'Moltres'],
-        147 => ['fr' => 'Minidraco', 'en' => 'Dratini'],
-        148 => ['fr' => 'Draco', 'en' => 'Dragonair'],
-        149 => ['fr' => 'Dracolosse', 'en' => 'Dragonite'],
-        150 => ['fr' => 'Mewtwo', 'en' => 'Mewtwo'],
-        151 => ['fr' => 'Mew', 'en' => 'Mew'],
     ];
 
     /**
@@ -199,180 +40,61 @@ final class PokemonData
         'rock' => ['fr' => 'Roche', 'en' => 'Rock'],
         'ghost' => ['fr' => 'Spectre', 'en' => 'Ghost'],
         'dragon' => ['fr' => 'Dragon', 'en' => 'Dragon'],
-        'fairy' => ['fr' => 'Fee', 'en' => 'Fairy'],
+        'dark' => ['fr' => 'Ténèbres', 'en' => 'Dark'],
+        'steel' => ['fr' => 'Acier', 'en' => 'Steel'],
+        'fairy' => ['fr' => 'Fée', 'en' => 'Fairy'],
     ];
 
+    private static ?array $loadedData = null;
+
     /**
-     * Pokemon types (Generation 1)
-     * Key: Pokemon ID, Value: array of type codes
+     * Load Pokemon data from JSON file
      */
-    private const TYPES = [
-        1 => ['grass', 'poison'],
-        2 => ['grass', 'poison'],
-        3 => ['grass', 'poison'],
-        4 => ['fire'],
-        5 => ['fire'],
-        6 => ['fire', 'flying'],
-        7 => ['water'],
-        8 => ['water'],
-        9 => ['water'],
-        10 => ['bug'],
-        11 => ['bug'],
-        12 => ['bug', 'flying'],
-        13 => ['bug', 'poison'],
-        14 => ['bug', 'poison'],
-        15 => ['bug', 'poison'],
-        16 => ['normal', 'flying'],
-        17 => ['normal', 'flying'],
-        18 => ['normal', 'flying'],
-        19 => ['normal'],
-        20 => ['normal'],
-        21 => ['normal', 'flying'],
-        22 => ['normal', 'flying'],
-        23 => ['poison'],
-        24 => ['poison'],
-        25 => ['electric'],
-        26 => ['electric'],
-        27 => ['ground'],
-        28 => ['ground'],
-        29 => ['poison'],
-        30 => ['poison'],
-        31 => ['poison', 'ground'],
-        32 => ['poison'],
-        33 => ['poison'],
-        34 => ['poison', 'ground'],
-        35 => ['fairy'],
-        36 => ['fairy'],
-        37 => ['fire'],
-        38 => ['fire'],
-        39 => ['normal', 'fairy'],
-        40 => ['normal', 'fairy'],
-        41 => ['poison', 'flying'],
-        42 => ['poison', 'flying'],
-        43 => ['grass', 'poison'],
-        44 => ['grass', 'poison'],
-        45 => ['grass', 'poison'],
-        46 => ['bug', 'grass'],
-        47 => ['bug', 'grass'],
-        48 => ['bug', 'poison'],
-        49 => ['bug', 'poison'],
-        50 => ['ground'],
-        51 => ['ground'],
-        52 => ['normal'],
-        53 => ['normal'],
-        54 => ['water'],
-        55 => ['water'],
-        56 => ['fighting'],
-        57 => ['fighting'],
-        58 => ['fire'],
-        59 => ['fire'],
-        60 => ['water'],
-        61 => ['water'],
-        62 => ['water', 'fighting'],
-        63 => ['psychic'],
-        64 => ['psychic'],
-        65 => ['psychic'],
-        66 => ['fighting'],
-        67 => ['fighting'],
-        68 => ['fighting'],
-        69 => ['grass', 'poison'],
-        70 => ['grass', 'poison'],
-        71 => ['grass', 'poison'],
-        72 => ['water', 'poison'],
-        73 => ['water', 'poison'],
-        74 => ['rock', 'ground'],
-        75 => ['rock', 'ground'],
-        76 => ['rock', 'ground'],
-        77 => ['fire'],
-        78 => ['fire'],
-        79 => ['water', 'psychic'],
-        80 => ['water', 'psychic'],
-        81 => ['electric'],
-        82 => ['electric'],
-        83 => ['normal', 'flying'],
-        84 => ['normal', 'flying'],
-        85 => ['normal', 'flying'],
-        86 => ['water'],
-        87 => ['water', 'ice'],
-        88 => ['poison'],
-        89 => ['poison'],
-        90 => ['water'],
-        91 => ['water', 'ice'],
-        92 => ['ghost', 'poison'],
-        93 => ['ghost', 'poison'],
-        94 => ['ghost', 'poison'],
-        95 => ['rock', 'ground'],
-        96 => ['psychic'],
-        97 => ['psychic'],
-        98 => ['water'],
-        99 => ['water'],
-        100 => ['electric'],
-        101 => ['electric'],
-        102 => ['grass', 'psychic'],
-        103 => ['grass', 'psychic'],
-        104 => ['ground'],
-        105 => ['ground'],
-        106 => ['fighting'],
-        107 => ['fighting'],
-        108 => ['normal'],
-        109 => ['poison'],
-        110 => ['poison'],
-        111 => ['ground', 'rock'],
-        112 => ['ground', 'rock'],
-        113 => ['normal'],
-        114 => ['grass'],
-        115 => ['normal'],
-        116 => ['water'],
-        117 => ['water'],
-        118 => ['water'],
-        119 => ['water'],
-        120 => ['water'],
-        121 => ['water', 'psychic'],
-        122 => ['psychic', 'fairy'],
-        123 => ['bug', 'flying'],
-        124 => ['ice', 'psychic'],
-        125 => ['electric'],
-        126 => ['fire'],
-        127 => ['bug'],
-        128 => ['normal'],
-        129 => ['water'],
-        130 => ['water', 'flying'],
-        131 => ['water', 'ice'],
-        132 => ['normal'],
-        133 => ['normal'],
-        134 => ['water'],
-        135 => ['electric'],
-        136 => ['fire'],
-        137 => ['normal'],
-        138 => ['rock', 'water'],
-        139 => ['rock', 'water'],
-        140 => ['rock', 'water'],
-        141 => ['rock', 'water'],
-        142 => ['rock', 'flying'],
-        143 => ['normal'],
-        144 => ['ice', 'flying'],
-        145 => ['electric', 'flying'],
-        146 => ['fire', 'flying'],
-        147 => ['dragon'],
-        148 => ['dragon'],
-        149 => ['dragon', 'flying'],
-        150 => ['psychic'],
-        151 => ['psychic'],
-    ];
+    private static function loadData(): array
+    {
+        if (self::$loadedData !== null) {
+            return self::$loadedData;
+        }
+
+        $dataPath = dirname(__DIR__, 2) . '/data/pokemon_data.json';
+
+        if (file_exists($dataPath)) {
+            $json = file_get_contents($dataPath);
+            self::$loadedData = json_decode($json, true) ?? [];
+        } else {
+            self::$loadedData = [];
+        }
+
+        return self::$loadedData;
+    }
 
     /**
-     * Get available generations (currently only gen 1 is supported)
+     * Get available generations
      * @return array<int, array{name: string, range: array{0: int, 1: int}, available: bool}>
      */
     public static function getGenerations(): array
     {
+        $data = self::loadData();
         $generations = [];
-        foreach (self::GENERATIONS as $gen => $data) {
+
+        foreach (self::GENERATIONS as $gen => $genData) {
+            [$start, $end] = $genData['range'];
+
+            // Check if we have data for this generation
+            $hasData = false;
+            for ($id = $start; $id <= $end; $id++) {
+                if (isset($data[$id])) {
+                    $hasData = true;
+                    break;
+                }
+            }
+
             $generations[$gen] = [
-                ...$data,
-                'available' => $gen === 1, // Only gen 1 is available for now
+                ...$genData,
+                'available' => $hasData,
             ];
         }
+
         return $generations;
     }
 
@@ -395,7 +117,14 @@ final class PokemonData
      */
     public static function getPokemonName(int $id, string $language = 'fr'): ?string
     {
-        return self::NAMES[$id][$language] ?? self::NAMES[$id]['en'] ?? null;
+        $data = self::loadData();
+
+        if (!isset($data[$id])) {
+            return null;
+        }
+
+        $names = $data[$id]['names'] ?? [];
+        return $names[$language] ?? $names['en'] ?? null;
     }
 
     /**
@@ -445,12 +174,12 @@ final class PokemonData
         $normalized = self::removeAccents($normalized);
 
         // Remove spaces, hyphens, dots, and special characters
-        $normalized = preg_replace('/[\s\-\.\'\"]/', '', $normalized);
+        $normalized = preg_replace('/[\s\-\.\'\"\:\!]/', '', $normalized);
 
         // Handle Nidoran special case - remove gender symbols
         $normalized = str_replace(['♀', '♂', 'f', 'm'], '', $normalized);
 
-        // Remove "mr" or "m" prefix for Mr. Mime
+        // Remove "mr" or "m" prefix for Mr. Mime style names
         if (str_starts_with($normalized, 'mrmime') || str_starts_with($normalized, 'mmime')) {
             $normalized = 'mrmime';
         }
@@ -490,9 +219,6 @@ final class PokemonData
 
         // Special handling for Nidoran - accept "nidoran" for both
         if ($pokemonId === 29 || $pokemonId === 32) {
-            // For Nidoran♀ (29) and Nidoran♂ (32), also accept just "nidoran"
-            // but we need to be careful - the quiz should differentiate them
-            // For simplicity, accept "nidoran" + any suffix or just the base
             if (str_starts_with($normalizedInput, 'nidoran')) {
                 return true;
             }
@@ -502,11 +228,21 @@ final class PokemonData
     }
 
     /**
-     * Get the audio URL for a Pokemon cry
+     * Get the local audio path for a Pokemon cry
+     * @param string $version 'latest' or 'legacy'
      */
-    public static function getCryUrl(int $pokemonId): string
+    public static function getLocalCryPath(int $pokemonId, string $version = 'latest'): string
     {
-        return "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/{$pokemonId}.ogg";
+        return "/audio/pokemon/{$version}/{$pokemonId}.ogg";
+    }
+
+    /**
+     * Get the remote audio URL for a Pokemon cry (fallback)
+     * @param string $version 'latest' or 'legacy'
+     */
+    public static function getCryUrl(int $pokemonId, string $version = 'latest'): string
+    {
+        return "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/{$version}/{$pokemonId}.ogg";
     }
 
     /**
@@ -515,7 +251,8 @@ final class PokemonData
      */
     public static function getPokemonTypes(int $id): array
     {
-        return self::TYPES[$id] ?? [];
+        $data = self::loadData();
+        return $data[$id]['types'] ?? [];
     }
 
     /**
@@ -528,9 +265,17 @@ final class PokemonData
         $translated = [];
 
         foreach ($types as $type) {
-            $translated[] = self::TYPE_NAMES[$type][$language] ?? self::TYPE_NAMES[$type]['en'] ?? $type;
+            $translated[] = self::TYPE_NAMES[$type][$language] ?? self::TYPE_NAMES[$type]['en'] ?? ucfirst($type);
         }
 
         return $translated;
+    }
+
+    /**
+     * Clear loaded data cache (useful for testing)
+     */
+    public static function clearCache(): void
+    {
+        self::$loadedData = null;
     }
 }
