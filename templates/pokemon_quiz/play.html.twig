@@ -443,6 +443,46 @@
         color: rgba(255, 255, 255, 0.6);
     }
 
+    /* Closeness feedback */
+    .closeness-hint {
+        margin-top: 0.5rem;
+        font-size: 0.95rem;
+        font-weight: bold;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .closeness-hint.active {
+        opacity: 1;
+    }
+
+    .closeness-hint.hot {
+        color: #48BB78;
+    }
+
+    .closeness-hint.warm {
+        color: #F6AD55;
+    }
+
+    .answer-input.hot {
+        border-color: #48BB78;
+        box-shadow: 0 0 20px rgba(72, 187, 120, 0.4);
+    }
+
+    .answer-input.warm {
+        border-color: #F6AD55;
+        box-shadow: 0 0 20px rgba(246, 173, 85, 0.4);
+    }
+
+    @keyframes hotPulse {
+        0%, 100% { box-shadow: 0 0 20px rgba(72, 187, 120, 0.4); }
+        50% { box-shadow: 0 0 30px rgba(72, 187, 120, 0.7); }
+    }
+
+    .answer-input.hot {
+        animation: hotPulse 1s infinite;
+    }
+
     /* History Section - Pokemon Grid */
     .history-section {
         background: rgba(255, 255, 255, 0.05);
@@ -682,6 +722,7 @@
                     autocapitalize="off"
                     spellcheck="false"
                 >
+                <p class="closeness-hint" id="closeness-hint"></p>
                 <p class="hint-text">Les accents et espaces sont ignores</p>
             </div>
         </div>
@@ -759,6 +800,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const skipBtn = document.getElementById('skip-btn');
     const revealAnswer = document.getElementById('reveal-answer');
     const revealName = document.getElementById('reveal-name');
+    const closenessHint = document.getElementById('closeness-hint');
 
     // Initialize volume
     audio.volume = volumeSlider.value / 100;
@@ -907,6 +949,9 @@ document.addEventListener('DOMContentLoaded', function() {
         silhouetteContainer.classList.remove('active');
         silhouetteImg.src = '';
         revealAnswer.classList.remove('active');
+        answerInput.classList.remove('hot', 'warm');
+        closenessHint.classList.remove('active', 'hot', 'warm');
+        closenessHint.textContent = '';
     }
 
     // Skip current Pokemon and show answer
@@ -987,6 +1032,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const data = await response.json();
 
+            // Clear previous closeness state
+            answerInput.classList.remove('hot', 'warm');
+            closenessHint.classList.remove('active', 'hot', 'warm');
+            closenessHint.textContent = '';
+
             if (data.correct) {
                 // Correct answer
                 answerInput.classList.add('correct');
@@ -1011,6 +1061,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         answerInput.focus();
                     }
                 }, 500);
+            } else if (data.closeness) {
+                // Show closeness feedback
+                answerInput.classList.add(data.closeness);
+                closenessHint.classList.add('active', data.closeness);
+
+                if (data.closeness === 'hot') {
+                    closenessHint.textContent = 'Presque ! Verifie l\'orthographe...';
+                } else if (data.closeness === 'warm') {
+                    closenessHint.textContent = 'Tu es proche !';
+                }
             }
         } catch (err) {
             console.error('Error checking answer:', err);

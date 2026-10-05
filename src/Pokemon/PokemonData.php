@@ -228,6 +228,45 @@ final class PokemonData
     }
 
     /**
+     * Get closeness level between input and correct Pokemon name
+     * Returns: 'hot' (1-2 chars away), 'warm' (3-4 chars away), or null (too far)
+     */
+    public static function getCloseness(string $input, int $pokemonId, string $language = 'fr'): ?string
+    {
+        $pokemonName = self::getPokemonName($pokemonId, $language);
+        if ($pokemonName === null || trim($input) === '') {
+            return null;
+        }
+
+        $normalizedInput = self::normalizeForComparison($input);
+        $normalizedName = self::normalizeForComparison($pokemonName);
+
+        if ($normalizedInput === '' || $normalizedName === '') {
+            return null;
+        }
+
+        $distance = levenshtein($normalizedInput, $normalizedName);
+        $nameLength = mb_strlen($normalizedName);
+
+        // Scale thresholds based on name length
+        if ($nameLength <= 4) {
+            // Short names: only 'hot' at distance 1
+            if ($distance === 1) {
+                return 'hot';
+            }
+        } else {
+            if ($distance <= 2) {
+                return 'hot';
+            }
+            if ($distance <= 4) {
+                return 'warm';
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get the local audio path for a Pokemon cry
      * @param string $version 'latest' or 'legacy'
      */

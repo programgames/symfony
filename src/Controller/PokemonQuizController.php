@@ -64,10 +64,19 @@ final class PokemonQuizController extends AbstractController
         $isCorrect = PokemonData::checkAnswer($answer, (int) $pokemonId, $language);
         $correctName = PokemonData::getPokemonName((int) $pokemonId, $language);
 
-        return new JsonResponse([
+        $response = [
             'correct' => $isCorrect,
             'pokemonName' => $correctName,
             'pokemonId' => $pokemonId,
-        ]);
+        ];
+
+        if (!$isCorrect && $answer !== '') {
+            $closeness = PokemonData::getCloseness($answer, (int) $pokemonId, $language);
+            if ($closeness !== null) {
+                $response['closeness'] = $closeness;
+            }
+        }
+
+        return new JsonResponse($response);
     }
 }
