@@ -1,0 +1,628 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bee Tracker{% endblock %}
+
+{% block stylesheets %}
+<style>
+    :root {
+        --bg: #14161a;
+        --panel: #1c1f26;
+        --panel-2: #232730;
+        --line: #313743;
+        --text: #e6e8ec;
+        --muted: #939aa8;
+        --honey: #f0b429;
+        --owned: #3fb950;
+        --todo: #d29922;
+        --ready: #58a6ff;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        margin: 0;
+        font-size: 14px;
+    }
+
+    a { color: var(--ready); }
+
+    .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: var(--panel);
+        border-bottom: 1px solid var(--line);
+        padding: 10px 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .topbar h1 {
+        font-size: 16px;
+        margin: 0 8px 0 0;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .topbar h1 span { color: var(--honey); }
+
+    input[type="search"], select {
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        color: var(--text);
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+    input[type="search"] { min-width: 220px; flex: 1 1 220px; }
+    input[type="search"]:focus, select:focus { outline: 1px solid var(--honey); }
+
+    .bt {
+        background: var(--panel-2);
+        border: 1px solid var(--line);
+        color: var(--text);
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 13px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+    .bt:hover { border-color: var(--honey); }
+    .bt.on { border-color: var(--honey); color: var(--honey); }
+
+    .save-state {
+        margin-left: auto;
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--owned); }
+    .save-state.saving .dot { background: var(--todo); }
+    .save-state.error .dot { background: #f85149; }
+
+    .layout {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 16px;
+        padding: 16px;
+        align-items: start;
+    }
+    @media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } }
+
+    .panel-box {
+        background: var(--panel);
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        margin-bottom: 16px;
+        overflow: hidden;
+    }
+    .panel-box > h2 {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        margin: 0;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--line);
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+    }
+    .panel-box .body { padding: 12px 14px; }
+
+    /* Progression */
+    .progress-row {
+        display: grid;
+        grid-template-columns: 130px 1fr 62px;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 6px;
+        font-size: 12px;
+    }
+    .bar { height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; }
+    .bar > i { display: block; height: 100%; background: var(--honey); border-radius: 4px; transition: width .2s; }
+    .progress-row.total { font-weight: 600; font-size: 13px; }
+    .progress-row.total .bar > i { background: var(--owned); }
+    .progress-row .num { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+    /* Filtres mods */
+    .mod-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    /* Liste abeilles */
+    .mod-group + .mod-group { margin-top: 14px; }
+    .mod-group > h3 {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0 0 6px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+    .bee-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 6px; }
+
+    .bee {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--panel-2);
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--line);
+        border-radius: 6px;
+        padding: 6px 8px;
+        cursor: pointer;
+        user-select: none;
+    }
+    .bee:hover { border-color: var(--honey); }
+    .bee .swatch { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+    .bee .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bee .flag { font-size: 11px; color: var(--muted); flex: none; }
+    .bee[data-state="owned"] { border-left-color: var(--owned); }
+    .bee[data-state="owned"] .name { color: var(--muted); text-decoration: line-through; }
+    .bee[data-state="todo"] { border-left-color: var(--todo); }
+    .bee.is-ready { border-left-color: var(--ready); }
+    .bee.selected { outline: 1px solid var(--honey); }
+
+    .star {
+        border: none;
+        background: none;
+        color: #4b5262;
+        cursor: pointer;
+        font-size: 13px;
+        padding: 0 2px;
+        line-height: 1;
+    }
+    .star:hover { color: var(--todo); }
+    .bee[data-state="todo"] .star { color: var(--todo); }
+
+    /* Débloquables */
+    .ready-item {
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--ready);
+        border-radius: 6px;
+        padding: 7px 9px;
+        margin-bottom: 6px;
+        background: var(--panel-2);
+    }
+    .ready-item .head { display: flex; align-items: center; gap: 6px; }
+    .ready-item .head strong { cursor: pointer; }
+    .ready-item .head strong:hover { color: var(--honey); }
+    .ready-item .meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .chance { font-size: 11px; padding: 1px 5px; border-radius: 4px; background: #1f6feb33; color: var(--ready); flex: none; }
+    .req { display: inline-block; font-size: 10px; padding: 1px 5px; border-radius: 4px; background: #30363d; color: #c9d1d9; margin: 2px 3px 0 0; }
+
+    /* Arbre */
+    .tree { font-size: 13px; }
+    .tree ul { list-style: none; margin: 0; padding-left: 14px; border-left: 1px dashed var(--line); }
+    .tree > ul { padding-left: 0; border: none; }
+    .tree li { margin: 4px 0; }
+    .tree .node { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .tree .node .lbl { cursor: pointer; }
+    .tree .node .lbl:hover { color: var(--honey); }
+    .tree .have { color: var(--owned); }
+    .tree .have .lbl { text-decoration: line-through; opacity: .75; }
+    .tree .root-missing { color: #f85149; }
+
+    .empty { color: var(--muted); font-size: 12px; font-style: italic; }
+    .sticky { position: sticky; top: 62px; }
+</style>
+{% endblock %}
+
+{% block body %}
+<script id="bee-data" type="application/json">{{ data|json_encode|raw }}</script>
+<script id="bee-state" type="application/json">{{ state|json_encode|raw }}</script>
+
+<div class="topbar">
+    <h1>🐝 Bee <span>Tracker</span></h1>
+    <input type="search" id="search" placeholder="Rechercher une abeille…" autocomplete="off">
+    <select id="filter-state">
+        <option value="all">Toutes</option>
+        <option value="missing">Manquantes</option>
+        <option value="owned">Obtenues</option>
+        <option value="todo">Prioritaires</option>
+        <option value="ready">Débloquables maintenant</option>
+    </select>
+    <button class="bt" id="btn-export">Export</button>
+    <button class="bt" id="btn-import">Import</button>
+    <input type="file" id="file-import" accept="application/json" hidden>
+    <div class="save-state" id="save-state"><span class="dot"></span><span id="save-label">Synchronisé</span></div>
+</div>
+
+<div class="layout">
+    <div>
+        <div class="panel-box">
+            <h2>Filtres mods <button class="bt" id="btn-mods-toggle">Tout / Aucun</button></h2>
+            <div class="body mod-filters" id="mod-filters">
+                {% for mod in mods %}
+                    <button class="bt on" data-mod="{{ mod.id }}">{{ mod.id }} <span style="color:var(--muted)">{{ mod.count }}</span></button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="panel-box">
+            <h2>Abeilles <span id="list-count" style="color:var(--muted)"></span></h2>
+            <div class="body">
+                <p class="empty" style="margin:0 0 10px">Clic = obtenue / non obtenue · ★ = prioritaire · ⇢ = chemin d'obtention</p>
+                <div id="bee-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sticky">
+        <div class="panel-box">
+            <h2>Progression</h2>
+            <div class="body" id="progress"></div>
+        </div>
+
+        <div class="panel-box">
+            <h2>Débloquables maintenant <span id="ready-count" style="color:var(--muted)"></span></h2>
+            <div class="body" id="ready-list"></div>
+        </div>
+
+        <div class="panel-box">
+            <h2>Chemin d'obtention</h2>
+            <div class="body" id="path-panel"><p class="empty">Cliquez sur le nom d'une abeille pour voir son arbre de croisement.</p></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+(() => {
+    'use strict';
+
+    const DATA = JSON.parse(document.getElementById('bee-data').textContent);
+    const BEES = DATA.bees;
+    const MUTATIONS = DATA.mutations;
+    const initial = JSON.parse(document.getElementById('bee-state').textContent);
+
+    /** États : absent = non obtenue, 'owned' = obtenue, 'todo' = prioritaire. */
+    let states = initial.states || {};
+
+    // Index : abeille -> mutations qui la produisent / où elle est parent
+    const producedBy = {};
+    for (const m of MUTATIONS) (producedBy[m.c] ||= []).push(m);
+    for (const list of Object.values(producedBy)) list.sort((a, b) => (b.ch || 0) - (a.ch || 0));
+
+    const has = (key) => states[key] === 'owned';
+    const label = (key) => BEES[key] ? BEES[key].n : key;
+    const pct = (n) => Math.round(n * 100);
+
+    // ---------- Sauvegarde temps réel (POST debouncé, changements accumulés) ----------
+    const saveEl = document.getElementById('save-state');
+    const saveLabel = document.getElementById('save-label');
+    let pending = {};
+    let timer = null;
+    let inFlight = false;
+
+    function setSaveStatus(cls, text) {
+        saveEl.className = 'save-state' + (cls ? ' ' + cls : '');
+        saveLabel.textContent = text;
+    }
+
+    function queueChange(key, value) {
+        pending[key] = value;
+        setSaveStatus('saving', 'Enregistrement…');
+        clearTimeout(timer);
+        timer = setTimeout(flush, 250);
+    }
+
+    async function flush() {
+        if (inFlight || Object.keys(pending).length === 0) return;
+        const changes = pending;
+        pending = {};
+        inFlight = true;
+        try {
+            const res = await fetch('{{ path('app_bees_state_save') }}', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({changes}),
+            });
+            if (!res.ok) throw new Error(await res.text());
+            setSaveStatus('', 'Synchronisé');
+        } catch (e) {
+            // On remet les changements en file pour ne rien perdre.
+            pending = Object.assign(changes, pending);
+            setSaveStatus('error', 'Erreur — nouvelle tentative');
+            setTimeout(flush, 3000);
+        } finally {
+            inFlight = false;
+            if (Object.keys(pending).length) flush();
+        }
+    }
+
+    window.addEventListener('beforeunload', (e) => {
+        if (Object.keys(pending).length || inFlight) { e.preventDefault(); e.returnValue = ''; }
+    });
+
+    function setState(key, value) {
+        if (value === null) delete states[key]; else states[key] = value;
+        queueChange(key, value);
+        render();
+    }
+
+    // ---------- Calculs ----------
+    /** Mutations réalisables : les deux parents possédés, enfant pas encore obtenu. */
+    function readyMutations() {
+        const out = [];
+        for (const m of MUTATIONS) {
+            if (has(m.a) && has(m.b) && !has(m.c)) out.push(m);
+        }
+        out.sort((x, y) => (y.ch || 0) - (x.ch || 0) || label(x.c).localeCompare(label(y.c)));
+        return out;
+    }
+
+    const readySet = () => new Set(readyMutations().map((m) => m.c));
+
+    /** Arbre des croisements manquants pour obtenir `key` (meilleure chance d'abord). */
+    function buildPath(key, seen = new Set()) {
+        if (has(key)) return {key, have: true};
+        if (seen.has(key)) return {key, cycle: true};
+        const muts = producedBy[key];
+        if (!muts || !muts.length) return {key, root: true};
+        seen = new Set(seen).add(key);
+        const m = muts[0];
+        return {
+            key,
+            mutation: m,
+            alternatives: muts.length - 1,
+            parents: [buildPath(m.a, seen), buildPath(m.b, seen)],
+        };
+    }
+
+    /** Nombre de croisements restants dans l'arbre (nœuds manquants uniques). */
+    function countMissing(node, acc = new Set()) {
+        if (node.have || node.root || node.cycle) return acc;
+        acc.add(node.key);
+        node.parents.forEach((p) => countMissing(p, acc));
+        return acc;
+    }
+
+    // ---------- Rendu ----------
+    const el = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+    const reqBadges = (m) => (m.r || []).map((r) => `<span class="req">${esc(r.t)}</span>`).join('');
+    /** Les chances vont de 0.001 (0.1 %) à 1 : on garde des décimales sous 1 %. */
+    const chanceTxt = (m) => {
+        if (m.ch == null) return '?';
+        const v = m.ch * 100;
+        return (v >= 1 ? Math.round(v) : parseFloat(v.toFixed(2))) + '%';
+    };
+
+    let selected = null;
+    let activeMods = new Set(Object.values(BEES).map((b) => b.m));
+
+    function renderProgress() {
+        const byMod = {};
+        for (const [key, b] of Object.entries(BEES)) {
+            const s = (byMod[b.m] ||= {total: 0, owned: 0});
+            s.total++;
+            if (has(key)) s.owned++;
+        }
+        const total = Object.values(byMod).reduce((a, s) => a + s.total, 0);
+        const owned = Object.values(byMod).reduce((a, s) => a + s.owned, 0);
+        const rows = Object.entries(byMod).sort((a, b) => b[1].total - a[1].total).map(([mod, s]) => `
+            <div class="progress-row"><span>${esc(mod)}</span>
+                <span class="bar"><i style="width:${s.total ? pct(s.owned / s.total) : 0}%"></i></span>
+                <span class="num">${s.owned}/${s.total}</span></div>`).join('');
+        document.getElementById('progress').innerHTML = `
+            <div class="progress-row total"><span>Total</span>
+                <span class="bar"><i style="width:${pct(owned / total)}%"></i></span>
+                <span class="num">${owned}/${total}</span></div>` + rows;
+    }
+
+    function renderReady() {
+        const list = readyMutations();
+        document.getElementById('ready-count').textContent = list.length;
+        const box = document.getElementById('ready-list');
+        if (!list.length) {
+            box.innerHTML = '<p class="empty">Aucun croisement disponible avec vos abeilles actuelles.</p>';
+            return;
+        }
+        box.innerHTML = list.slice(0, 60).map((m) => `
+            <div class="ready-item">
+                <div class="head">
+                    <strong data-select="${esc(m.c)}">${esc(label(m.c))}</strong>
+                    <span class="chance">${chanceTxt(m)}</span>
+                    <button class="bt" data-own="${esc(m.c)}" style="margin-left:auto;padding:2px 7px">✓</button>
+                </div>
+                <div class="meta">${esc(label(m.a))} × ${esc(label(m.b))}</div>
+                ${m.r && m.r.length ? `<div>${reqBadges(m)}</div>` : ''}
+            </div>`).join('') + (list.length > 60 ? `<p class="empty">… et ${list.length - 60} autres</p>` : '');
+    }
+
+    function renderList() {
+        const q = document.getElementById('search').value.trim().toLowerCase();
+        const filter = document.getElementById('filter-state').value;
+        const ready = readySet();
+        const groups = {};
+        let count = 0;
+
+        // Comptés à part pour expliquer une liste vide : la recherche seule vs. les autres filtres.
+        let matchQuery = 0, hiddenByMod = 0, hiddenByState = 0;
+
+        for (const [key, b] of Object.entries(BEES)) {
+            if (q && !b.n.toLowerCase().includes(q) && !key.toLowerCase().includes(q) && !(b.b || '').toLowerCase().includes(q)) continue;
+            matchQuery++;
+            if (!activeMods.has(b.m)) { hiddenByMod++; continue; }
+            const st = states[key];
+            if ((filter === 'missing' && st === 'owned')
+                || (filter === 'owned' && st !== 'owned')
+                || (filter === 'todo' && st !== 'todo')
+                || (filter === 'ready' && !ready.has(key))) { hiddenByState++; continue; }
+            (groups[b.m] ||= []).push([key, b]);
+            count++;
+        }
+
+        document.getElementById('list-count').textContent = count + ' affichée(s)';
+        const container = document.getElementById('bee-container');
+
+        if (!count) {
+            const why = [];
+            if (hiddenByMod) why.push(`${hiddenByMod} masquée(s) par les filtres mods`);
+            if (hiddenByState) why.push(`${hiddenByState} masquée(s) par le filtre « ${document.getElementById('filter-state').selectedOptions[0].textContent} »`);
+            container.innerHTML = matchQuery
+                ? `<p class="empty">${matchQuery} abeille(s) correspondent à la recherche mais sont masquées : ${why.join(', ')}.
+                   <button class="bt" id="btn-reset-filters">Réinitialiser les filtres</button></p>`
+                : '<p class="empty">Aucune abeille ne correspond à la recherche.</p>';
+            return;
+        }
+
+        container.innerHTML = Object.entries(groups)
+            .sort((a, b) => b[1].length - a[1].length)
+            .map(([mod, list]) => `
+                <div class="mod-group">
+                    <h3>${esc(mod)} — ${list.length}</h3>
+                    <div class="bee-list">${list
+                        .sort((x, y) => x[1].n.localeCompare(y[1].n))
+                        .map(([key, b]) => `
+                            <div class="bee${ready.has(key) ? ' is-ready' : ''}${selected === key ? ' selected' : ''}"
+                                 data-key="${esc(key)}" data-state="${esc(states[key] || 'none')}" title="${esc(key)}">
+                                <span class="swatch" style="background:${esc(b.c)}"></span>
+                                <span class="name">${esc(b.n)}</span>
+                                ${ready.has(key) ? '<span class="flag">dispo</span>' : ''}
+                                <button class="star" data-todo="${esc(key)}" title="Prioriser">★</button>
+                                <button class="star" data-select="${esc(key)}" title="Voir le chemin d'obtention">⇢</button>
+                            </div>`).join('')}
+                    </div>
+                </div>`).join('');
+    }
+
+    function nodeHtml(node) {
+        if (node.have) return `<li><div class="node have"><span class="lbl" data-select="${esc(node.key)}">✔ ${esc(label(node.key))}</span></div></li>`;
+        if (node.cycle) return `<li><div class="node"><span class="lbl">↻ ${esc(label(node.key))}</span></div></li>`;
+        if (node.root) return `<li><div class="node root-missing"><span class="lbl" data-select="${esc(node.key)}">${esc(label(node.key))}</span>
+            <span class="req">à trouver en ruche sauvage</span>
+            <button class="bt" data-own="${esc(node.key)}" style="padding:1px 6px">✓</button></div></li>`;
+        const m = node.mutation;
+        return `<li>
+            <div class="node">
+                <span class="lbl" data-select="${esc(node.key)}">${esc(label(node.key))}</span>
+                <span class="chance">${chanceTxt(m)}</span>
+                ${node.alternatives ? `<span class="req">+${node.alternatives} voie(s)</span>` : ''}
+                ${reqBadges(m)}
+                <button class="bt" data-own="${esc(node.key)}" style="padding:1px 6px">✓</button>
+            </div>
+            <ul>${node.parents.map(nodeHtml).join('')}</ul>
+        </li>`;
+    }
+
+    function renderPath() {
+        const box = document.getElementById('path-panel');
+        if (!selected) {
+            box.innerHTML = '<p class="empty">Cliquez sur le nom d\'une abeille pour voir son arbre de croisement.</p>';
+            return;
+        }
+        const b = BEES[selected];
+        const tree = buildPath(selected);
+        const missing = countMissing(tree).size;
+        box.innerHTML = `
+            <div style="margin-bottom:8px">
+                <strong style="color:var(--honey)">${esc(b.n)}</strong>
+                <span class="req">${esc(b.m)}</span>${b.b ? `<span class="req">${esc(b.b)}</span>` : ''}
+                <div class="meta" style="font-size:11px;color:var(--muted);margin-top:4px">
+                    ${has(selected) ? 'Déjà obtenue.' : missing + ' croisement(s) restant(s).'}
+                    ${b.p && b.p.length ? '<br>Produits : ' + esc(b.p.join(', ')) : ''}
+                </div>
+            </div>
+            <div class="tree"><ul>${nodeHtml(tree)}</ul></div>`;
+    }
+
+    function render() {
+        renderProgress();
+        renderReady();
+        renderList();
+        renderPath();
+    }
+
+    // ---------- Événements ----------
+    document.addEventListener('click', (e) => {
+        const own = e.target.closest('[data-own]');
+        if (own) { setState(own.dataset.own, 'owned'); return; }
+
+        const todo = e.target.closest('[data-todo]');
+        if (todo) {
+            const k = todo.dataset.todo;
+            setState(k, states[k] === 'todo' ? null : 'todo');
+            return;
+        }
+
+        const sel = e.target.closest('[data-select]');
+        if (sel) { selected = sel.dataset.select; render(); return; }
+
+        const bee = e.target.closest('.bee');
+        if (bee) {
+            const k = bee.dataset.key;
+            setState(k, states[k] === 'owned' ? null : 'owned');
+            return;
+        }
+
+        const mod = e.target.closest('#mod-filters [data-mod]');
+        if (mod) {
+            const id = mod.dataset.mod;
+            activeMods.has(id) ? activeMods.delete(id) : activeMods.add(id);
+            mod.classList.toggle('on');
+            renderList();
+        }
+    });
+
+    document.getElementById('btn-mods-toggle').addEventListener('click', () => {
+        const btns = [...document.querySelectorAll('#mod-filters [data-mod]')];
+        const all = activeMods.size === btns.length;
+        activeMods = all ? new Set() : new Set(btns.map((b) => b.dataset.mod));
+        btns.forEach((b) => b.classList.toggle('on', !all));
+        renderList();
+    });
+
+    // Bouton généré dynamiquement dans le message de liste vide.
+    document.getElementById('bee-container').addEventListener('click', (e) => {
+        if (!e.target.closest('#btn-reset-filters')) return;
+        activeMods = new Set(Object.values(BEES).map((b) => b.m));
+        document.querySelectorAll('#mod-filters [data-mod]').forEach((b) => b.classList.add('on'));
+        document.getElementById('filter-state').value = 'all';
+        renderList();
+    });
+
+    document.getElementById('search').addEventListener('input', renderList);
+    document.getElementById('filter-state').addEventListener('change', renderList);
+
+    document.getElementById('btn-export').addEventListener('click', () => {
+        window.location.href = '{{ path('app_bees_export') }}';
+    });
+
+    const fileInput = document.getElementById('file-import');
+    document.getElementById('btn-import').addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', async () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        try {
+            const parsed = JSON.parse(await file.text());
+            const incoming = parsed.states || parsed;
+            const changes = {};
+            for (const key of Object.keys(BEES)) {
+                const next = incoming[key] || null;
+                if ((states[key] || null) !== next) changes[key] = next;
+            }
+            for (const [k, v] of Object.entries(changes)) { if (v === null) delete states[k]; else states[k] = v; }
+            Object.assign(pending, changes);
+            setSaveStatus('saving', 'Enregistrement…');
+            flush();
+            render();
+        } catch (err) {
+            alert('Fichier invalide : ' + err.message);
+        } finally {
+            fileInput.value = '';
+        }
+    });
+
+    render();
+})();
+</script>
+{% endblock %}
