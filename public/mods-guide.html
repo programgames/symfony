@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DiscoverMC — Guide des Mods</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --card2: #20232f;
+      --border: #2a2d3e;
+      --text: #e2e4f0;
+      --muted: #7b7f9e;
+      --accent-qol:   #4ade80;
+      --accent-tech:  #60a5fa;
+      --accent-magic: #c084fc;
+      --accent-lib:   #94a3b8;
+      --accent-deco:  #fb923c;
+      --accent-xplore:#f472b6;
+      --accent-gen:   #34d399;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #60a5fa, #c084fc, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p {
+      color: var(--muted);
+      margin-top: .5rem;
+      font-size: .95rem;
+    }
+
+    /* Search bar */
+    .search-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2.5rem;
+    }
+
+    #search {
+      width: 100%;
+      max-width: 480px;
+      padding: .7rem 1.2rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    #search:focus { border-color: #60a5fa; }
+    #search::placeholder { color: var(--muted); }
+
+    /* Category pills nav */
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      justify-content: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .nav-pill {
+      padding: .35rem .9rem;
+      border-radius: 999px;
+      font-size: .8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all .15s;
+      text-decoration: none;
+      user-select: none;
+    }
+
+    .nav-pill:hover { opacity: .8; }
+
+    /* Grid of sections */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* Section card */
+    .section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-icon {
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+
+    .section-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .section-count {
+      margin-left: auto;
+      font-size: .75rem;
+      font-weight: 600;
+      padding: .2rem .55rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,.07);
+      color: var(--muted);
+    }
+
+    /* Mod rows */
+    .mod-list {
+      padding: .5rem 0;
+      overflow-y: auto;
+    }
+
+    .mod-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: .5rem;
+      padding: .5rem 1.2rem;
+      transition: background .12s;
+    }
+
+    .mod-row:hover {
+      background: var(--card2);
+    }
+
+    .mod-name {
+      font-size: .88rem;
+      font-weight: 600;
+    }
+
+    .mod-desc {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-top: .1rem;
+    }
+
+    .mod-tag {
+      font-size: .68rem;
+      font-weight: 700;
+      padding: .15rem .45rem;
+      border-radius: 4px;
+      white-space: nowrap;
+      opacity: .85;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+
+    /* Highlight for search */
+    .hidden { display: none !important; }
+
+    mark {
+      background: #f59e0b44;
+      color: inherit;
+      border-radius: 2px;
+    }
+
+    /* Color per category */
+    [data-cat="qol"]   .section-title, [data-cat="qol"]   .section-icon { color: var(--accent-qol); }
+    [data-cat="tech"]  .section-title, [data-cat="tech"]  .section-icon { color: var(--accent-tech); }
+    [data-cat="magic"] .section-title, [data-cat="magic"] .section-icon { color: var(--accent-magic); }
+    [data-cat="lib"]   .section-title, [data-cat="lib"]   .section-icon { color: var(--accent-lib); }
+    [data-cat="deco"]  .section-title, [data-cat="deco"]  .section-icon { color: var(--accent-deco); }
+    [data-cat="xplore"].section-title, [data-cat="xplore"].section-icon { color: var(--accent-xplore); }
+    [data-cat="gen"]   .section-title, [data-cat="gen"]   .section-icon { color: var(--accent-gen); }
+
+    [data-cat="qol"]    .mod-tag { background: #4ade8022; color: var(--accent-qol); border: 1px solid #4ade8040; }
+    [data-cat="tech"]   .mod-tag { background: #60a5fa22; color: var(--accent-tech); border: 1px solid #60a5fa40; }
+    [data-cat="magic"]  .mod-tag { background: #c084fc22; color: var(--accent-magic); border: 1px solid #c084fc40; }
+    [data-cat="lib"]    .mod-tag { background: #94a3b822; color: var(--accent-lib); border: 1px solid #94a3b840; }
+    [data-cat="deco"]   .mod-tag { background: #fb923c22; color: var(--accent-deco); border: 1px solid #fb923c40; }
+    [data-cat="xplore"] .mod-tag { background: #f472b622; color: var(--accent-xplore); border: 1px solid #f472b640; }
+    [data-cat="gen"]    .mod-tag { background: #34d39922; color: var(--accent-gen); border: 1px solid #34d39940; }
+
+    .nav-pill[data-cat="qol"]    { background: #4ade8022; color: var(--accent-qol);    border-color: #4ade8050; }
+    .nav-pill[data-cat="tech"]   { background: #60a5fa22; color: var(--accent-tech);   border-color: #60a5fa50; }
+    .nav-pill[data-cat="magic"]  { background: #c084fc22; color: var(--accent-magic);  border-color: #c084fc50; }
+    .nav-pill[data-cat="lib"]    { background: #94a3b822; color: var(--accent-lib);    border-color: #94a3b850; }
+    .nav-pill[data-cat="deco"]   { background: #fb923c22; color: var(--accent-deco);   border-color: #fb923c50; }
+    .nav-pill[data-cat="xplore"] { background: #f472b622; color: var(--accent-xplore); border-color: #f472b650; }
+    .nav-pill[data-cat="gen"]    { background: #34d39922; color: var(--accent-gen);    border-color: #34d39950; }
+    .nav-pill[data-cat="all"]    { background: #ffffff12; color: var(--text);           border-color: #ffffff25; }
+
+    .nav-pill.active { opacity: 1; box-shadow: 0 0 0 2px currentColor; }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      color: var(--muted);
+      font-size: .8rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⛏ DiscoverMC — Guide des Mods</h1>
+  <p>Trouve rapidement les mods selon tes besoins • <strong>~207 mods</strong> • MC 1.20.1 Forge</p>
+</header>
+
+<div class="search-wrap">
+  <input id="search" type="text" placeholder="🔍  Rechercher un mod ou une description…" autocomplete="off" />
+</div>
+
+<nav class="nav">
+  <span class="nav-pill active" data-cat="all">Tout afficher</span>
+  <span class="nav-pill" data-cat="qol">🟢 QOL</span>
+  <span class="nav-pill" data-cat="tech">🔵 Tech</span>
+  <span class="nav-pill" data-cat="magic">🟣 Magie</span>
+  <span class="nav-pill" data-cat="lib">⚪ Lib</span>
+  <span class="nav-pill" data-cat="deco">🟠 Déco / Building</span>
+  <span class="nav-pill" data-cat="xplore">🩷 Exploration</span>
+  <span class="nav-pill" data-cat="gen">🟩 Génération</span>
+</nav>
+
+<div class="grid" id="grid">
+
+  <!-- ═══════════════════════════════════════ QOL ═══════════════════════════════════════ -->
+  <div class="section" data-cat="qol">
+    <div class="section-header">
+      <span class="section-icon">🟢</span>
+      <span class="section-title">QOL — Quality of Life</span>
+      <span class="section-count">48</span>
+    </div>
+    <div class="mod-list">
+      <div class="mod-row"><div><div class="mod-name">AI Improvements</div><div class="mod-desc">Améliore l'IA des mobs</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">All The Leaks</div><div class="mod-desc">Correctifs de fuites mémoire</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Almost Unified</div><div class="mod-desc">Unification des recettes (tags)</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">AppleSkin</div><div class="mod-desc">Infos faim et saturation</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Better Advancements</div><div class="mod-desc">Interface des advancements améliorée</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">BetterF3</div><div class="mod-desc">Écran F3 lisible et coloré</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Bridging Mod</div><div class="mod-desc">Aide à la construction en pont</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Carry On</div><div class="mod-desc">Porter des blocs et entités à la main</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Charm of Undying</div><div class="mod-desc">Totem logeable dans les slots Curios</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Clean Swing</div><div class="mod-desc">Supprime l'animation de frappe à vide</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Climb Ladders Fast</div><div class="mod-desc">Monte les échelles plus vite</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Clumps</div><div class="mod-desc">Regroupe les orbes d'XP en un seul</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Comforts</div><div class="mod-desc">Sacs de couchage et hamacs</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Controlling</div><div class="mod-desc">Recherche dans les raccourcis clavier</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Crafting on a Stick</div><div class="mod-desc">Table de craft portable</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Ding</div><div class="mod-desc">Son quand le jeu finit de charger</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Distant Horizons</div><div class="mod-desc">LOD rendering — voir très loin</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Durability Tooltip</div><div class="mod-desc">Durabilité affichée au survol</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Easy Anvils</div><div class="mod-desc">Enclume sans limite de coût</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Easy Villagers</div><div class="mod-desc">Gestion simplifiée des villageois</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Eating Animation</div><div class="mod-desc">Animation réaliste quand on mange</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Embeddium</div><div class="mod-desc">Optimisation OpenGL des performances</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Enchantment Descriptions</div><div class="mod-desc">Descriptions des enchantements dans JEI</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Explorer's Compass</div><div class="mod-desc">Trouve les structures proches</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Extreme Sound Muffler</div><div class="mod-desc">Mise en sourdine sélective des sons</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Fast Furnace</div><div class="mod-desc">Fourneau plus rapide (optimisé)</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Fast Leaf Decay</div><div class="mod-desc">Les feuilles tombent rapidement</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Fast Workbench</div><div class="mod-desc">Établi plus performant</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Ferrite Core</div><div class="mod-desc">Optimisation de la consommation RAM</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Find Me</div><div class="mod-desc">Localise les items dans les conteneurs voisins</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Fuel Goes Here</div><div class="mod-desc">Indique quels items servent de carburant</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Immediately Fast</div><div class="mod-desc">Optimisation du rendu immédiat</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Inventory Sorter</div><div class="mod-desc">Tri automatique de l'inventaire</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Jade</div><div class="mod-desc">Tooltip d'info sur les blocs/entités (WAILA)</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">JEI</div><div class="mod-desc">Recettes et usages de tous les items</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">JourneyMap</div><div class="mod-desc">Mini-carte et carte plein écran</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">JourneyMap Integration</div><div class="mod-desc">Affiche les waypoints des mods sur la carte</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Just Enough Breeding</div><div class="mod-desc">Recettes d'élevage dans JEI</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Just Enough Professions</div><div class="mod-desc">Professions des villageois dans JEI</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Just Enough Resources</div><div class="mod-desc">Drops et ressources dans JEI</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Just Zoom</div><div class="mod-desc">Zoom optique ajustable</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Keybinds Purger</div><div class="mod-desc">Supprime les raccourcis inutilisés</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Lootr</div><div class="mod-desc">Coffres de loot uniques par joueur</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Measurements</div><div class="mod-desc">Mesure des distances en jeu</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Mod Name Tooltip</div><div class="mod-desc">Nom du mod source dans les tooltips</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Mouse Tweaks</div><div class="mod-desc">Améliorations souris pour l'inventaire</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">More Villagers</div><div class="mod-desc">Plus de types de villageois et métiers</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Nature's Compass</div><div class="mod-desc">Trouve les biomes souhaités</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Nether Portal Fix</div><div class="mod-desc">Correction du lien des portails Nether</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">No Trample</div><div class="mod-desc">Empêche de piétiner les cultures</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Polymorph</div><div class="mod-desc">Résolution des conflits de recettes</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Quark</div><div class="mod-desc">Des dizaines d'améliorations vanilla</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Scalable Cats Force</div><div class="mod-desc">Optimisation du chargement de chunks</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Shrink</div><div class="mod-desc">Rétrécit la taille du joueur</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Simple Magnets</div><div class="mod-desc">Aimants pour items et orbes d'XP</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Spark</div><div class="mod-desc">Profiler de performances in-game</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Tempad</div><div class="mod-desc">Dispositif de téléportation (style Doctor Who)</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Time in a Bottle</div><div class="mod-desc">Accélère le temps localement</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Tombstone</div><div class="mod-desc">Pierre tombale à la mort pour ne rien perdre</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Too Fast</div><div class="mod-desc">Accélère certaines actions du joueur</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Torch Master</div><div class="mod-desc">Méga-torche qui empêche les spawns de mobs</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Trash Cans</div><div class="mod-desc">Poubelles blocs pour détruire des items</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Trash Slot</div><div class="mod-desc">Slot poubelle directement dans l'inventaire</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">Waystones</div><div class="mod-desc">Bornes de téléportation à placer dans le monde</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">yCurrenci</div><div class="mod-desc">Système de monnaie entre joueurs</div></div><span class="mod-tag">QOL</span></div>
+      <div class="mod-row"><div><div class="mod-name">YUNG's Menu Tweaks</div><div class="mod-desc">Amélioration du menu principal</div></div><span class="mod-tag">QOL</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ TECH ══════════════════════════════════════ -->
+  <div class="section" data-cat="tech">
+    <div class="section-header">
+      <span class="section-icon">🔵</span>
+      <span class="section-title">Tech — Automatisation & Énergie</span>
+      <span class="section-count">55</span>
+    </div>
+    <div class="mod-list">
+      <div class="mod-row"><div><div class="mod-name">Accelerated Decay</div><div class="mod-desc">Radioactivité et décroissance nucléaire</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Ad Astra</div><div class="mod-desc">Exploration spatiale — fusées, planètes, stations</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Ad Astra Extra Additions</div><div class="mod-desc">Contenus additionnels pour Ad Astra</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Ad Astra Giselle Addon</div><div class="mod-desc">Extension pour Ad Astra</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Additional Enchanted Miner</div><div class="mod-desc">Foreuse enchantée automatique (quarry)</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Advanced AE</div><div class="mod-desc">Extensions avancées pour AE2</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Advanced Peripherals</div><div class="mod-desc">Périphériques avancés pour CC: Tweaked</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">AE2 Things</div><div class="mod-desc">Composants supplémentaires pour AE2</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">AE2 Insert Export Card</div><div class="mod-desc">Cartes d'import/export améliorées AE2</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">AE2 Wireless Terminals Lib</div><div class="mod-desc">Terminaux sans fil pour AE2</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">AE Additions</div><div class="mod-desc">Ajouts divers pour Applied Energistics 2</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Applied Energistics 2</div><div class="mod-desc">Stockage et automatisation numérique</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Applied Flux</div><div class="mod-desc">Pont entre AE2 et Flux Networks</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Applied Schematic Cannon</div><div class="mod-desc">Canon à schéma via AE2</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Better Create</div><div class="mod-desc">Améliorations et tweaks pour Create</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">CC: Tweaked</div><div class="mod-desc">Ordinateurs et robots programmables en Lua</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">CCCBridge</div><div class="mod-desc">Pont CC: Tweaked ↔ Create</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Create</div><div class="mod-desc">Automatisation mécanique et rotative</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Create: Central Kitchen</div><div class="mod-desc">Automatisation de la cuisine avec Create</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Create: Enchantment Industry</div><div class="mod-desc">Industrie des enchantements via Create</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Create: Jetpack</div><div class="mod-desc">Jetpack alimenté par Create</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Create: New Age</div><div class="mod-desc">Électricité et moteurs électriques pour Create</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Create: Stuff & Additions</div><div class="mod-desc">Ajouts divers pour Create</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Create: Ore Excavation</div><div class="mod-desc">Excavation minière automatisée avec Create</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Dank Storage</div><div class="mod-desc">Stockage haute capacité portable</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Dark Utilities</div><div class="mod-desc">Blocs utilitaires divers (filtres, collecteurs…)</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Elevator ID</div><div class="mod-desc">Ascenseurs blocs montants/descendants</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Energy Meter</div><div class="mod-desc">Mesure la consommation d'énergie RF</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Flux Networks</div><div class="mod-desc">Réseaux sans fil de transport d'énergie RF</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Functional Storage</div><div class="mod-desc">Tiroirs de stockage modulaires avancés</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Hyperbox</div><div class="mod-desc">Espace spatial AE2 dans un bloc</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Immersive Engineering</div><div class="mod-desc">Technologie industrielle réaliste multiblocs</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Integrated Dynamics</div><div class="mod-desc">Automatisation logique avancée</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Integrated Crafting</div><div class="mod-desc">Craft automatique pour Integrated Dynamics</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Integrated Terminals</div><div class="mod-desc">Terminaux pour Integrated Dynamics</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Integrated Tunnels</div><div class="mod-desc">Transport d'items/fluides pour Integrated Dynamics</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Iron Chests</div><div class="mod-desc">Coffres en métal avec plus de slots</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Iron Furnaces</div><div class="mod-desc">Fourneaux en métal plus rapides</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Iron Jetpacks</div><div class="mod-desc">Jetpacks upgradables en différents métaux</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Item Collectors</div><div class="mod-desc">Collecteurs automatiques d'items au sol</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Little Logistics</div><div class="mod-desc">Transport logistique (bateaux, trains)</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Mega Cells</div><div class="mod-desc">Cellules de stockage géantes pour AE2</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Mekanism</div><div class="mod-desc">Tech avancée — gaz, machines, armures, énergie</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">ME Requester</div><div class="mod-desc">Requêtes automatiques de craft AE2</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Mini Utilities</div><div class="mod-desc">Petits blocs utilitaires pratiques</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Modular Routers</div><div class="mod-desc">Routeurs d'items modulaires et configurables</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">More Red / CCT Compat</div><div class="mod-desc">Extensions redstone Project Red + CC compat</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Mystical Agriculture</div><div class="mod-desc">Cultures qui produisent des ressources</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Mystical Agradditions</div><div class="mod-desc">Cultures supplémentaires pour Mystical Agriculture</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Occulting Engineering</div><div class="mod-desc">Pont entre Occultism et AE2</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Pneumaticraft: Repressurized</div><div class="mod-desc">Tech à air comprimé, drones, tubules</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Pocket Storage</div><div class="mod-desc">Inventaire portable upgradable</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Powah</div><div class="mod-desc">Générateurs et stockage d'énergie RF</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Productive Bees</div><div class="mod-desc">Abeilles produisant des ressources spécifiques</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Project Red: Core / Integration</div><div class="mod-desc">Redstone avancée et circuits logiques</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Pylons</div><div class="mod-desc">Blocs d'effets de zone (récolte auto, etc.)</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Redstone Arsenal</div><div class="mod-desc">Armes et outils alimentés par énergie RF</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">RFTools Builder</div><div class="mod-desc">Construction / destruction de zones</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">RFTools Control</div><div class="mod-desc">Programmation de machines par blocs</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">RFTools Dimensions</div><div class="mod-desc">Création de dimensions personnalisées</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">RFTools Power</div><div class="mod-desc">Génération et stockage d'énergie RF</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">RFTools Storage</div><div class="mod-desc">Stockage avancé par modules</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">RFTools Utility</div><div class="mod-desc">Utilitaires divers RFTools</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Simple Storage Network</div><div class="mod-desc">Réseau de stockage simple et efficace</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Sophisticated Backpacks</div><div class="mod-desc">Sacs à dos upgradeables avec modules</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Sophisticated Storage</div><div class="mod-desc">Coffres upgradeables avec modules</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Steam 'n' Rails</div><div class="mod-desc">Trains et rails avancés pour Create</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">Storage Drawers</div><div class="mod-desc">Tiroirs de stockage visuels</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">UtilitiX</div><div class="mod-desc">Utilitaires additionnels RFTools</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">XNet</div><div class="mod-desc">Réseau de câbles pour items, fluides, énergie</div></div><span class="mod-tag">Tech</span></div>
+      <div class="mod-row"><div><div class="mod-name">XNet Gases</div><div class="mod-desc">Extension XNet pour les gaz (Mekanism)</div></div><span class="mod-tag">Tech</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ MAGIE ═════════════════════════════════════ -->
+  <div class="section" data-cat="magic">
+    <div class="section-header">
+      <span class="section-icon">🟣</span>
+      <span class="section-title">Magie — Sorts & Rituels</span>
+      <span class="section-count">19</span>
+    </div>
+    <div class="mod-list">
+      <div class="mod-row"><div><div class="mod-name">Apotheosis</div><div class="mod-desc">Refonte des enchantements, gems, loot avancé</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Apotheotic Additions</div><div class="mod-desc">Contenus additionnels pour Apotheosis</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Ars Nouveau</div><div class="mod-desc">Magie par création de sorts runiques</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Ars Additions</div><div class="mod-desc">Sorts et contenus supplémentaires pour Ars Nouveau</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Ars Contrôle</div><div class="mod-desc">Sorts de contrôle des mobs (Ars Nouveau)</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Ars Creo</div><div class="mod-desc">Pont entre Ars Nouveau et Create</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Ars Elemental</div><div class="mod-desc">Nouveaux glyphes élémentaires pour Ars Nouveau</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Ars Ocultas</div><div class="mod-desc">Extension ésotérique pour Ars Nouveau</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">ArsEng</div><div class="mod-desc">Pont entre Ars Nouveau et AE2</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Botania</div><div class="mod-desc">Magie florale — mana, rituels, outils naturels</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">EvilCraft</div><div class="mod-desc">Magie sombre et nécromancide</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Forbidden Arcanus</div><div class="mod-desc">Artefacts et magie ancienne mystérieuse</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Iron's Spellbooks</div><div class="mod-desc">Système de sorts style RPG</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Occultism</div><div class="mod-desc">Invocation de démons, rituels, dimension de stockage</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Psi</div><div class="mod-desc">Magie programmable — sorts en séquence logique</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Relics</div><div class="mod-desc">Reliques magiques puissantes à débloquer</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Reliquary</div><div class="mod-desc">Artefacts et objets magiques rares</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Roots Classic</div><div class="mod-desc">Magie druidique à base de plantes et herbes</div></div><span class="mod-tag">Magie</span></div>
+      <div class="mod-row"><div><div class="mod-name">Artifacts</div><div class="mod-desc">Objets rares et puissants dans les donjons</div></div><span class="mod-tag">Magie</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ LIB ═══════════════════════════════════════ -->
+  <div class="section" data-cat="lib">
+    <div class="section-header">
+      <span class="section-icon">⚙️</span>
+      <span class="section-title">Lib — Bibliothèques (technique)</span>
+      <span class="section-count">45</span>
+    </div>
+    <div class="mod-list">
+      <div class="mod-row"><div><div class="mod-name">Architectury</div><div class="mod-desc">API cross-platform Forge/Fabric</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Athena</div><div class="mod-desc">Lib pour les systèmes d'armures</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Attribute Fix</div><div class="mod-desc">Correction des limites d'attributs vanilla</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Apothic Attributes</div><div class="mod-desc">Système d'attributs étendu (Apotheosis)</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Balm</div><div class="mod-desc">Abstraction multi-plateforme</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">BlockUI</div><div class="mod-desc">UI pour les blocs (MineColonies)</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Bookshelf</div><div class="mod-desc">Lib utilitaire commune</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Botarium</div><div class="mod-desc">API énergie, fluides, items</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">CB Multipart</div><div class="mod-desc">Support multipart pour blocs complexes</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Citadel</div><div class="mod-desc">Lib d'animations et d'entités</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Cloth Config</div><div class="mod-desc">API de configuration UI</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">CodeChicken Lib</div><div class="mod-desc">Lib CodeChicken</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">CoFH Core</div><div class="mod-desc">Base pour les mods CoFH / Thermal</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Collective</div><div class="mod-desc">Lib partagée entre mods collectifs</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Common Capabilities</div><div class="mod-desc">API capabilities communes</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Configured</div><div class="mod-desc">Interface graphique de configuration de mods</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Cucumber</div><div class="mod-desc">Lib pour Mystical Agriculture</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Cupboard</div><div class="mod-desc">Lib utilitaire</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Curios API</div><div class="mod-desc">API pour les slots d'accessoires (bagues, amulettes…)</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Cyclops Core</div><div class="mod-desc">Lib pour Integrated Dynamics</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">GeckoLib</div><div class="mod-desc">Lib d'animations pour entités et blocs</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">iChunUtil</div><div class="mod-desc">Lib pour les mods iChun</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Iron's Lib</div><div class="mod-desc">Lib pour Iron's Spellbooks</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Kotlin for Forge</div><div class="mod-desc">Support du langage Kotlin sur Forge</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Konkrete</div><div class="mod-desc">Lib utilitaire</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Lemon Lib</div><div class="mod-desc">Lib utilitaire</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">LibX</div><div class="mod-desc">Lib utilitaire</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">McJtyLib</div><div class="mod-desc">Lib pour les mods de McJty (RFTools…)</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Modonomicon</div><div class="mod-desc">Lib pour créer des livres de guidage in-game</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Moonlight</div><div class="mod-desc">Lib utilitaire multi-usage</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Nolijium</div><div class="mod-desc">Optimisation et lib de performance</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">OctoLib</div><div class="mod-desc">Lib utilitaire</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Patchouli</div><div class="mod-desc">Lib pour les livres in-game</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Placebo</div><div class="mod-desc">Lib pour Apotheosis et mods associés</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Player Animation Lib</div><div class="mod-desc">Lib d'animations du joueur</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Puzzles Lib</div><div class="mod-desc">Lib utilitaire multi-usage</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Resourceful Config / Lib</div><div class="mod-desc">API de configuration et lib générique</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">RFTools Base</div><div class="mod-desc">Lib de base pour tous les mods RFTools</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Runelic</div><div class="mod-desc">Lib d'écriture runique</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Smart Brain Lib</div><div class="mod-desc">Lib pour l'IA des entités</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Sophisticated Core</div><div class="mod-desc">Lib pour Sophisticated Storage & Backpacks</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Supermartijn Config/Core Lib</div><div class="mod-desc">Libs utilitaires Supermartijn</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">TerraBlender</div><div class="mod-desc">API d'injection de biomes personnalisés</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Titanium</div><div class="mod-desc">Lib pour Pneumaticraft et Industrial Foregoing</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Valhelsia Core</div><div class="mod-desc">Lib pour les mods Valhelsia</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">YACL</div><div class="mod-desc">Yet Another Config Lib — configuration avancée</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">YUNG's API</div><div class="mod-desc">Lib commune pour tous les mods YUNG's</div></div><span class="mod-tag">Lib</span></div>
+      <div class="mod-row"><div><div class="mod-name">Zeta</div><div class="mod-desc">Lib de base pour Quark</div></div><span class="mod-tag">Lib</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ DÉCO ═════════════════════════════════════ -->
+  <div class="section" data-cat="deco">
+    <div class="section-header">
+      <span class="section-icon">🟠</span>
+      <span class="section-title">Déco / Building</span>
+      <span class="section-count">13</span>
+    </div>
+    <div class="mod-list">
+      <div class="mod-row"><div><div class="mod-name">Amendments</div><div class="mod-desc">Blocs vanilla améliorés (étagères, cadres…)</div></div><span class="mod-tag">Déco</span></div>
+      <div class="mod-row"><div><div class="mod-name">Building Gadgets 2</div><div class="mod-desc">Gadgets pour construire rapidement en masse</div></div><span class="mod-tag">Déco</span></div>
+      <div class="mod-row"><div><div class="mod-name">Chisels & Bits</div><div class="mod-desc">Sculpture voxel de blocs à l'unité</div></div><span class="mod-tag">Déco</span></div>
+      <div class="mod-row"><div><div class="mod-name">Connected Glass</div><div class="mod-desc">Vitres connectées sans bordure visible</div></div><span class="mod-tag">Déco</span></div>
+      <div class="mod-row"><div><div class="mod-name">Construction Wand</div><div class="mod-desc">Baguette pour construire en ligne ou en plan</div></div><span class="mod-tag">Déco</span></div>
+      <div class="mod-row"><div><div class="mod-name">CTM (Connected Textures Mod)</div><div class="mod-desc">Textures connectées pour les blocs</div></div><span class="mod-tag">Déco</span></div>
+      <div class="mod-row"><div><div class="mod-name">Domum Ornamentum</div><div class="mod-desc">Blocs décoratifs combinés (MineColonies)</div></div><span class="mod-tag">Déco</span></div>
+      <div class="mod-row"><div><div class="mod-name">Exchangers</div><div class="mod-desc">Échange les blocs placés sans les casser</div></div><span class="mod-tag">Déco</span></div>
+      <div class="mod-row"><div><div class="mod-name">Fusion</div><div class="mod-desc">Textures connectées avancées</div></div><span class="mod-tag">Déco</span></div>
+      <div class="mod-row"><div><div class="mod-name">Macaw's Doors</div><div class="mod-desc">Portes décoratives variées</div></div><span class="mod-tag">Déco</span></div>
+      <div class="mod-row"><div><div class="mod-name">Macaw's Fences</div><div class="mod-desc">Barrières décoratives variées</div></div><span class="mod-tag">Déco</span></div>
+      <div class="mod-row"><div><div class="mod-name">Macaw's Windows</div><div class="mod-desc">Fenêtres décoratives variées</div></div><span class="mod-tag">Déco</span></div>
+      <div class="mod-row"><div><div class="mod-name">Supplementaries</div><div class="mod-desc">Blocs décoratifs et utilitaires vanilla+</div></div><span class="mod-tag">Déco</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ EXPLORATION ══════════════════════════════ -->
+  <div class="section" data-cat="xplore">
+    <div class="section-header">
+      <span class="section-icon">🩷</span>
+      <span class="section-title">Exploration — Donjons & Boss</span>
+      <span class="section-count">11</span>
+    </div>
+    <div class="mod-list">
+      <div class="mod-row"><div><div class="mod-name">Ad Astra</div><div class="mod-desc">Explore l'espace — lune, mars, vénus…</div></div><span class="mod-tag">Xplore</span></div>
+      <div class="mod-row"><div><div class="mod-name">Cataclysm Fortresses</div><div class="mod-desc">Forteresses habitées par des boss Cataclysm</div></div><span class="mod-tag">Xplore</span></div>
+      <div class="mod-row"><div><div class="mod-name">L_Ender's Cataclysm</div><div class="mod-desc">Boss épiques et donjons colossaux</div></div><span class="mod-tag">Xplore</span></div>
+      <div class="mod-row"><div><div class="mod-name">JArchaeology</div><div class="mod-desc">Archéologie et fouilles de structures</div></div><span class="mod-tag">Xplore</span></div>
+      <div class="mod-row"><div><div class="mod-name">Loot Integrations</div><div class="mod-desc">Loot de mods dans les structures vanilla</div></div><span class="mod-tag">Xplore</span></div>
+      <div class="mod-row"><div><div class="mod-name">Loot Integrations YUNG's</div><div class="mod-desc">Loot spécifique aux structures YUNG's</div></div><span class="mod-tag">Xplore</span></div>
+      <div class="mod-row"><div><div class="mod-name">Lootr</div><div class="mod-desc">Coffres de loot uniques par joueur</div></div><span class="mod-tag">Xplore</span></div>
+      <div class="mod-row"><div><div class="mod-name">Rats</div><div class="mod-desc">Rats domesticables et donjon des rats</div></div><span class="mod-tag">Xplore</span></div>
+      <div class="mod-row"><div><div class="mod-name">Relics</div><div class="mod-desc">Reliques puissantes trouvées en explorant</div></div><span class="mod-tag">Xplore</span></div>
+      <div class="mod-row"><div><div class="mod-name">Structory</div><div class="mod-desc">Structures immersives générées dans le monde</div></div><span class="mod-tag">Xplore</span></div>
+      <div class="mod-row"><div><div class="mod-name">Artifacts</div><div class="mod-desc">Artefacts rares dans les coffres de donjons</div></div><span class="mod-tag">Xplore</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ GÉNÉRATION ═══════════════════════════════ -->
+  <div class="section" data-cat="gen">
+    <div class="section-header">
+      <span class="section-icon">🟩</span>
+      <span class="section-title">Génération — World Gen</span>
+      <span class="section-count">16</span>
+    </div>
+    <div class="mod-list">
+      <div class="mod-row"><div><div class="mod-name">RFTools Dimensions</div><div class="mod-desc">Création de dimensions personnalisées</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">Structory</div><div class="mod-desc">Structures décoratives immersives dans le monde</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">TerraBlender</div><div class="mod-desc">API d'injection de biomes — prérequis pour biomes moddés</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">YUNG's Better Caves</div><div class="mod-desc">Cavernes entièrement redessinées</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">YUNG's Better Desert Temples</div><div class="mod-desc">Temples du désert retravaillés</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">YUNG's Better Dungeons</div><div class="mod-desc">Donjons souterrains retravaillés</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">YUNG's Better End Island</div><div class="mod-desc">Île de l'End retravaillée</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">YUNG's Better Jungle Temples</div><div class="mod-desc">Temples de la jungle retravaillés</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">YUNG's Better Mineshafts</div><div class="mod-desc">Mines abandonnées retravaillées</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">YUNG's Better Nether Fortresses</div><div class="mod-desc">Forteresses du Nether retravaillées</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">YUNG's Better Ocean Monuments</div><div class="mod-desc">Monuments océaniques retravaillés</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">YUNG's Better Strongholds</div><div class="mod-desc">Forteresses retravaillées</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">YUNG's Better Witch Huts</div><div class="mod-desc">Huttes de sorcière retravaillées</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">YUNG's Bridges</div><div class="mod-desc">Ponts générés naturellement dans le monde</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">YUNG's Extras</div><div class="mod-desc">Structures bonus supplémentaires</div></div><span class="mod-tag">Gen</span></div>
+      <div class="mod-row"><div><div class="mod-name">Cataclysm Fortresses</div><div class="mod-desc">Forteresses des boss Cataclysm générées dans le monde</div></div><span class="mod-tag">Gen</span></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  DiscoverMC 1.3 — Minecraft 1.20.1 Forge &nbsp;·&nbsp; ~207 mods
+</footer>
+
+<script>
+  // ── Filter by category ──
+  const pills = document.querySelectorAll('.nav-pill');
+  const sections = document.querySelectorAll('.section');
+  let activeCat = 'all';
+
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      activeCat = pill.dataset.cat;
+      pills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      applyFilters();
+    });
+  });
+
+  // ── Search ──
+  const searchInput = document.getElementById('search');
+  searchInput.addEventListener('input', applyFilters);
+
+  function applyFilters() {
+    const query = searchInput.value.toLowerCase().trim();
+
+    sections.forEach(section => {
+      const cat = section.dataset.cat;
+      const catMatch = activeCat === 'all' || activeCat === cat;
+
+      if (!catMatch) { section.classList.add('hidden'); return; }
+
+      const rows = section.querySelectorAll('.mod-row');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        const nameEl  = row.querySelector('.mod-name');
+        const descEl  = row.querySelector('.mod-desc');
+        const name    = nameEl.textContent.toLowerCase();
+        const desc    = descEl.textContent.toLowerCase();
+        const matches = !query || name.includes(query) || desc.includes(query);
+
+        row.classList.toggle('hidden', !matches);
+        if (matches) {
+          visibleCount++;
+          // highlight
+          nameEl.innerHTML = highlight(nameEl.textContent, query);
+          descEl.innerHTML = highlight(descEl.textContent, query);
+        } else {
+          nameEl.innerHTML = nameEl.textContent;
+          descEl.innerHTML = descEl.textContent;
+        }
+      });
+
+      section.classList.toggle('hidden', visibleCount === 0);
+    });
+  }
+
+  function highlight(text, query) {
+    if (!query) return text;
+    const idx = text.toLowerCase().indexOf(query);
+    if (idx === -1) return text;
+    return text.slice(0, idx) +
+      '<mark>' + text.slice(idx, idx + query.length) + '</mark>' +
+      text.slice(idx + query.length);
+  }
+</script>
+</body>
+</html>
