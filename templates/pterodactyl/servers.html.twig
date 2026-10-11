@@ -14,228 +14,184 @@
 
     body {
         min-height: 100vh;
-        background: linear-gradient(180deg, #87CEEB 0%, #87CEEB 60%, #228B22 60%, #228B22 100%);
+        background: linear-gradient(180deg, #87CEEB 0%, #87CEEB 85%, #4a8c2a 85%, #4a8c2a 87%, #8B4513 87%);
         font-family: 'VT323', monospace;
-        position: relative;
         overflow-x: hidden;
     }
 
-    /* Pixelated clouds */
-    .clouds {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 60%;
-        pointer-events: none;
-        overflow: hidden;
-        z-index: 0;
-    }
-
-    .cloud {
-        position: absolute;
-        background: #fff;
-        box-shadow:
-            10px 0 0 #fff,
-            20px 0 0 #fff,
-            30px 0 0 #fff,
-            0 10px 0 #fff,
-            10px 10px 0 #fff,
-            20px 10px 0 #fff,
-            30px 10px 0 #fff,
-            40px 10px 0 #fff,
-            -10px 10px 0 #fff;
-        width: 10px;
-        height: 10px;
-        animation: float-cloud 60s linear infinite;
-        opacity: 0.9;
-    }
-
-    @keyframes float-cloud {
-        from { transform: translateX(-100px); }
-        to { transform: translateX(calc(100vw + 100px)); }
-    }
-
-    /* Ground blocks */
-    .ground {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 120px;
-        z-index: 1;
-        overflow: hidden;
-    }
-
-    .grass-layer {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 20px;
-        background: repeating-linear-gradient(
-            90deg,
-            #4a8c2a 0px,
-            #4a8c2a 16px,
-            #5a9c3a 16px,
-            #5a9c3a 32px,
-            #3a7c1a 32px,
-            #3a7c1a 48px
-        );
-    }
-
-    .dirt-layer {
-        position: absolute;
-        top: 20px;
-        left: 0;
-        width: 100%;
-        height: 100px;
-        background: repeating-linear-gradient(
-            90deg,
-            #8B4513 0px,
-            #8B4513 16px,
-            #7a3d10 16px,
-            #7a3d10 32px,
-            #9c5020 32px,
-            #9c5020 48px
-        );
-        background-size: 48px 100%;
-    }
-
-    /* Main container */
+    /* Page sur un seul écran : en-tête compact + grille qui prend le reste */
     .main-container {
-        position: relative;
-        z-index: 10;
         min-height: 100vh;
-        padding: 2rem;
-        padding-bottom: 150px;
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 1rem 1rem 4.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
     }
 
-    /* Header */
     .header {
-        text-align: center;
-        margin-bottom: 3rem;
-        padding-top: 2rem;
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.4rem 1.2rem;
     }
 
     .title {
         font-family: 'Press Start 2P', cursive;
-        font-size: 2.5rem;
+        font-size: 1.4rem;
         color: #fff;
         text-shadow:
-            4px 4px 0 #3a3a3a,
+            3px 3px 0 #3a3a3a,
             -2px -2px 0 #000,
             2px -2px 0 #000,
             -2px 2px 0 #000,
             2px 2px 0 #000;
-        margin-bottom: 0.5rem;
-        letter-spacing: 2px;
     }
 
     .subtitle {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         color: #fff;
         text-shadow: 2px 2px 0 #3a3a3a;
-        opacity: 0.9;
     }
 
-    /* Server cards container */
-    .servers-container {
-        max-width: 1000px;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
+    .servers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 0.75rem;
+        align-content: start;
     }
 
-    /* Server card - Minecraft inventory style */
+    /* Tuile serveur - style inventaire Minecraft */
     .server-card {
         background: #c6c6c6;
-        border: 4px solid #000;
-        box-shadow:
-            inset 4px 4px 0 #fff,
-            inset -4px -4px 0 #555,
-            8px 8px 0 rgba(0, 0, 0, 0.3);
-        padding: 0;
-        position: relative;
-        transition: transform 0.2s ease;
-    }
-
-    .server-card:hover {
-        transform: translateY(-4px);
-        box-shadow:
-            inset 4px 4px 0 #fff,
-            inset -4px -4px 0 #555,
-            12px 12px 0 rgba(0, 0, 0, 0.3);
-    }
-
-    .server-card-header {
-        background: linear-gradient(180deg, #8b8b8b 0%, #6d6d6d 100%);
-        border-bottom: 4px solid #000;
-        padding: 1rem 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-    }
-
-    .server-name-container {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        flex: 1;
-    }
-
-    .server-icon {
-        width: 48px;
-        height: 48px;
-        background: #8B4513;
         border: 3px solid #000;
         box-shadow:
-            inset 2px 2px 0 #a65d1a,
-            inset -2px -2px 0 #6b3510;
+            inset 3px 3px 0 #fff,
+            inset -3px -3px 0 #555,
+            5px 5px 0 rgba(0, 0, 0, 0.3);
+        padding: 0.6rem 0.75rem;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
+        flex-direction: column;
+        gap: 0.45rem;
+        min-width: 0;
     }
 
-    .server-icon::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 8px;
-        background: #4a8c2a;
-        border-bottom: 2px solid #3a7c1a;
+    .server-card.is-offline {
+        opacity: 0.75;
+    }
+
+    .server-head {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 0;
+    }
+
+    .status-dot {
+        flex: none;
+        width: 12px;
+        height: 12px;
+        border: 2px solid #000;
+    }
+
+    .status-dot.online {
+        background: #4CAF50;
+        box-shadow: 0 0 6px #4CAF50;
+    }
+
+    .status-dot.offline {
+        background: #f44336;
     }
 
     .server-name {
         font-family: 'Press Start 2P', cursive;
-        font-size: 1rem;
-        color: #fff;
-        text-shadow: 2px 2px 0 #000;
-        text-decoration: none;
-        transition: color 0.2s ease;
+        font-size: 0.65rem;
+        line-height: 1.4;
+        color: #000;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .server-name:hover {
-        color: #ffcc00;
+    .status-label {
+        margin-left: auto;
+        flex: none;
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .server-address {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: #8b8b8b;
+        border: 2px solid #000;
+        box-shadow:
+            inset 2px 2px 0 #aaa,
+            inset -2px -2px 0 #666;
+        padding: 0.2rem 0.2rem 0.2rem 0.5rem;
+    }
+
+    .server-address code {
+        flex: 1;
+        min-width: 0;
+        font-family: 'VT323', monospace;
+        font-size: 1.25rem;
+        color: #fff;
+        text-shadow: 1px 1px 0 #000;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .copy-btn {
+        flex: none;
+        background: #4CAF50;
+        border: 2px solid #000;
+        color: #fff;
+        padding: 0.1rem 0.5rem;
+        font-family: 'VT323', monospace;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow:
+            inset 1px 1px 0 #6bd66f,
+            inset -1px -1px 0 #2e7d32;
+    }
+
+    .copy-btn:hover {
+        background: #66BB6A;
+    }
+
+    .copy-btn:active {
+        transform: translateY(1px);
+        box-shadow: none;
+    }
+
+    .copy-btn.copied {
+        background: #2196F3;
+    }
+
+    .server-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        font-size: 1.1rem;
+        color: #333;
     }
 
     .curseforge-badge {
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.3rem;
         background: #f16436;
         color: #fff;
-        padding: 0.3rem 0.6rem;
-        font-size: 0.7rem;
+        padding: 0 0.4rem;
+        font-size: 1rem;
         border: 2px solid #000;
         text-decoration: none;
-        font-family: 'VT323', monospace;
-        transition: background 0.2s ease;
     }
 
     .curseforge-badge:hover {
@@ -244,297 +200,282 @@
     }
 
     .curseforge-badge svg {
-        width: 16px;
-        height: 16px;
+        width: 12px;
+        height: 12px;
         fill: currentColor;
     }
 
-    .status-badge {
-        padding: 0.4rem 1rem;
-        font-family: 'Press Start 2P', cursive;
-        font-size: 0.6rem;
-        border: 3px solid #000;
-        text-transform: uppercase;
-    }
-
-    .status-online {
-        background: #4CAF50;
-        color: #fff;
-        box-shadow:
-            inset 2px 2px 0 #6bd66f,
-            inset -2px -2px 0 #2e7d32;
-    }
-
-    .status-offline {
-        background: #f44336;
-        color: #fff;
-        box-shadow:
-            inset 2px 2px 0 #ff7961,
-            inset -2px -2px 0 #ba000d;
-    }
-
-    .server-card-body {
-        padding: 1.5rem;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-    }
-
-    .stat-block {
-        background: #8b8b8b;
-        border: 3px solid #000;
-        padding: 1rem;
-        box-shadow:
-            inset 2px 2px 0 #aaa,
-            inset -2px -2px 0 #666;
-    }
-
-    .stat-label {
-        font-size: 0.9rem;
-        color: #333;
-        margin-bottom: 0.5rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .stat-value {
-        font-family: 'Press Start 2P', cursive;
-        font-size: 0.9rem;
-        color: #000;
-        word-break: break-all;
-    }
-
-    .stat-value.memory {
-        color: #4CAF50;
-    }
-
-    .stat-value.port {
-        color: #2196F3;
-    }
-
-    .stat-value.url {
-        color: #9C27B0;
-    }
-
-    .copy-btn {
-        background: #4CAF50;
+    /* Icône du serveur (favicon renvoyé par le ping, sinon bloc d'herbe) */
+    .server-icon {
+        flex: none;
+        width: 32px;
+        height: 32px;
         border: 2px solid #000;
+        image-rendering: pixelated;
+        background: linear-gradient(180deg, #5d9b38 0 30%, #8b5a2b 30%);
+    }
+
+    .server-motd {
+        font-size: 1.05rem;
+        line-height: 1.1;
+        color: #444;
+        font-style: italic;
+        white-space: pre-line;
+        overflow-wrap: anywhere;
+    }
+
+    .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+
+    .chips:empty {
+        display: none;
+    }
+
+    .chip {
+        display: inline-flex;
+        align-items: center;
+        background: #6b6b6b;
         color: #fff;
-        padding: 0.3rem 0.6rem;
-        font-family: 'VT323', monospace;
-        font-size: 1rem;
-        cursor: pointer;
-        margin-left: 0.5rem;
+        text-shadow: 1px 1px 0 #000;
+        border: 2px solid #000;
+        padding: 0 0.4rem;
+        font-size: 1.05rem;
+        line-height: 1.3;
+    }
+
+    .chip.version { background: #3f76e4; }
+    .chip.loader { background: #a0522d; }
+    .chip.players { background: #4CAF50; }
+    .chip.players.empty { background: #6b6b6b; }
+    .chip.game { background: #7b52ab; }
+
+    .player-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.2rem 0.6rem;
+        font-size: 1.05rem;
+        color: #222;
+    }
+
+    .player-list span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .player-list img {
+        width: 16px;
+        height: 16px;
+        image-rendering: pixelated;
+    }
+
+    /* Infos techniques : petite grille clé / valeur */
+    .tech {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.15rem 0.75rem;
+        background: #b0b0b0;
+        border: 2px solid #000;
         box-shadow:
-            inset 1px 1px 0 #6bd66f,
-            inset -1px -1px 0 #2e7d32;
-        transition: all 0.1s ease;
+            inset 2px 2px 0 #d8d8d8,
+            inset -2px -2px 0 #7a7a7a;
+        padding: 0.3rem 0.5rem;
+        font-size: 1.05rem;
+        color: #222;
     }
 
-    .copy-btn:hover {
-        background: #66BB6A;
+    .tech div {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.4rem;
+        min-width: 0;
     }
 
-    .copy-btn:active {
-        transform: translateY(2px);
-        box-shadow: none;
-    }
-
-    .copy-btn.copied {
-        background: #2196F3;
-    }
-
-    /* Empty state */
-    .empty-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        background: #c6c6c6;
-        border: 4px solid #000;
-        box-shadow:
-            inset 4px 4px 0 #fff,
-            inset -4px -4px 0 #555;
-    }
-
-    .empty-state-icon {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-    }
-
-    .empty-state-text {
-        font-family: 'Press Start 2P', cursive;
-        font-size: 1rem;
+    .tech dt {
         color: #555;
     }
 
-    /* Info box */
-    .info-box {
-        max-width: 1000px;
-        margin: 2rem auto 0;
+    .tech dd {
+        text-align: right;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Jauge RAM façon barre d'expérience */
+    .tech .xp-bar {
+        grid-column: 1 / -1;
+        display: block;
+        height: 6px;
+        background: #2a2a2a;
+        border: 1px solid #000;
+    }
+
+    .xp-bar span {
+        display: block;
+        height: 100%;
+        background: #80ff20;
+    }
+
+    .xp-bar.high span {
+        background: #ff9d20;
+    }
+
+    .server-meta .egg {
+        font-size: 1rem;
+        color: #555;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 3rem 1rem;
         background: #c6c6c6;
-        border: 4px solid #000;
-        padding: 1rem 1.5rem;
-        box-shadow:
-            inset 4px 4px 0 #fff,
-            inset -4px -4px 0 #555;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .info-icon {
-        font-size: 2rem;
-    }
-
-    .info-text {
-        font-size: 1.2rem;
-        color: #333;
-    }
-
-    .info-text strong {
-        color: #000;
-    }
-
-    /* Back button */
-    .back-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: #8b8b8b;
         border: 3px solid #000;
-        color: #fff;
-        text-decoration: none;
-        padding: 0.6rem 1.2rem;
-        font-family: 'Press Start 2P', cursive;
-        font-size: 0.7rem;
         box-shadow:
-            inset 2px 2px 0 #aaa,
-            inset -2px -2px 0 #555;
-        transition: all 0.1s ease;
-        margin-bottom: 2rem;
+            inset 3px 3px 0 #fff,
+            inset -3px -3px 0 #555;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.8rem;
+        color: #555;
     }
 
-    .back-btn:hover {
-        background: #9b9b9b;
-        color: #fff;
-    }
-
-    .back-btn:active {
-        transform: translateY(2px);
-        box-shadow: inset -2px -2px 0 #aaa, inset 2px 2px 0 #555;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
+    @media (max-width: 600px) {
         .title {
-            font-size: 1.5rem;
-        }
-
-        .server-card-header {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .server-name {
-            font-size: 0.8rem;
-        }
-
-        .server-card-body {
-            grid-template-columns: 1fr;
+            font-size: 1rem;
         }
     }
 </style>
 {% endblock %}
 
 {% block body %}
-<!-- Clouds -->
-<div class="clouds">
-    {% for i in 1..6 %}
-    <div class="cloud" style="top: {{ random(5, 40) }}%; animation-delay: {{ i * -10 }}s; animation-duration: {{ random(45, 75) }}s; transform: scale({{ random(10, 20) / 10 }});"></div>
-    {% endfor %}
-</div>
-
-<!-- Ground -->
-<div class="ground">
-    <div class="grass-layer"></div>
-    <div class="dirt-layer"></div>
-</div>
-
 <div class="main-container">
-    <!-- Back button -->
-    <a href="{{ path('app_home') }}" class="back-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-        </svg>
-        Retour
-    </a>
-
-    <!-- Header -->
     <header class="header">
         <h1 class="title">Serveurs Minecraft</h1>
         <p class="subtitle">Rejoins l'aventure !</p>
     </header>
 
-    <!-- Servers list -->
-    <div class="servers-container">
+    <div class="servers-grid">
         {% for server in data %}
-        <div class="server-card">
-            <div class="server-card-header">
-                <div class="server-name-container">
-                    <div class="server-icon"></div>
-                    <div>
-                        {% if server.modpack and server.modpack.url %}
-                            <a href="{{ server.modpack.url }}" target="_blank" rel="noopener noreferrer" class="server-name">
-                                {{ server.name }}
-                            </a>
-                            <a href="{{ server.modpack.url }}" target="_blank" rel="noopener noreferrer" class="curseforge-badge">
-                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M18.326 9.218L19.378 12H24L18.074 14.41L19.854 24H13.062L12 20.428L10.938 24H4.146L5.926 14.41L0 12H4.622L5.674 9.218H8.058L6.584 12.892L5.504 18.648H8.196L9.036 15.14H12.964L13.804 18.648H16.496L15.416 12.892L13.942 9.218H18.326ZM12 2.056L14.388 0L15.156 3.016L12 4.11L8.844 3.016L9.612 0L12 2.056Z"/>
-                                </svg>
-                                {% if server.modpack.isDirectLink %}Modpack{% else %}Rechercher{% endif %}
-                            </a>
-                        {% else %}
-                            <span class="server-name">{{ server.name }}</span>
-                        {% endif %}
-                    </div>
-                </div>
-                {% if server.state == 'offline' %}
-                    <span class="status-badge status-offline">Hors ligne</span>
-                {% else %}
-                    <span class="status-badge status-online">En ligne</span>
+        {% set online = server.state != 'offline' %}
+        {% set mc = server.minecraft %}
+        <div class="server-card{{ online ? '' : ' is-offline' }}">
+            <div class="server-head">
+                {% if mc and mc.favicon %}
+                    <img class="server-icon" src="{{ mc.favicon }}" alt="">
+                {% elseif server.game == 'Minecraft' %}
+                    <span class="server-icon"></span>
                 {% endif %}
+                <span class="status-dot {{ online ? 'online' : 'offline' }}"></span>
+                <span class="server-name" title="{{ server.name }}">{{ server.name }}</span>
+                <span class="status-label">
+                    {%- if server.state == 'starting' %}Démarrage…{% elseif server.state == 'stopping' %}Arrêt…{% elseif online %}En ligne{% else %}Hors ligne{% endif -%}
+                </span>
             </div>
-            <div class="server-card-body">
-                <div class="stat-block">
-                    <div class="stat-label">Memoire</div>
-                    <div class="stat-value memory">{{ server.memoryLimit }} MB</div>
+
+            {% if mc and mc.motd and mc.motd != 'A Minecraft Server' and mc.motd != server.name %}
+            <p class="server-motd">{{ mc.motd }}</p>
+            {% endif %}
+            {% if server.description %}
+            <p class="server-motd">{{ server.description }}</p>
+            {% endif %}
+
+            {% if server.url %}
+            <div class="server-address">
+                <code>{{ server.url }}</code>
+                <button class="copy-btn" onclick="copyToClipboard('{{ server.url }}', this)">Copier</button>
+            </div>
+            {% endif %}
+
+            <div class="chips">
+                {%- if mc %}
+                    {% if mc.version %}<span class="chip version" title="Version de Minecraft (protocole {{ mc.protocol }})">{{ mc.version }}</span>{% endif %}
+                    <span class="chip loader">{{ mc.modLoader ?? 'Vanilla' }}{% if mc.modCount %} · {{ mc.modCount }} mods{% endif %}</span>
+                    <span class="chip players{{ mc.playersOnline == 0 ? ' empty' : '' }}" title="Joueurs connectés">{{ mc.playersOnline }} / {{ mc.playersMax }} joueurs</span>
+                {% elseif server.game != 'Minecraft' %}
+                    {% if server.game %}<span class="chip game">{{ server.game }}</span>{% endif %}
+                {% elseif server.state == 'running' %}
+                    <span class="chip">Le serveur charge encore…</span>
+                {% endif -%}
+            </div>
+
+            {% if mc and mc.players is not empty %}
+            <div class="player-list">
+                {% for player in mc.players %}
+                    <span><img src="https://mc-heads.net/avatar/{{ player|url_encode }}/16" alt="" loading="lazy">{{ player }}</span>
+                {% endfor %}
+                {% if mc.playersOnline > mc.players|length %}<span>+{{ mc.playersOnline - mc.players|length }}</span>{% endif %}
+            </div>
+            {% endif %}
+
+            <dl class="tech">
+                <div>
+                    <dt>RAM</dt>
+                    <dd>
+                        {%- if server.memoryUsed is not null %}{{ (server.memoryUsed / 1024)|round(1) }}{% if server.memoryLimit > 0 %} / {{ (server.memoryLimit / 1024)|round(1) }}{% endif %} Go
+                        {%- elseif server.memoryLimit > 0 %}{{ (server.memoryLimit / 1024)|round(1) }} Go
+                        {%- else %}illimitée{% endif -%}
+                    </dd>
                 </div>
-                <div class="stat-block">
-                    <div class="stat-label">Port</div>
-                    <div class="stat-value port">{{ server.port }}</div>
+                <div>
+                    <dt>CPU</dt>
+                    <dd>
+                        {%- if server.cpuUsed is not null %}{{ server.cpuUsed|round }} %{% if server.cpuLimit > 0 %} / {{ server.cpuLimit }} %{% endif %}
+                        {%- elseif server.cpuLimit > 0 %}max {{ server.cpuLimit }} %
+                        {%- else %}—{% endif -%}
+                    </dd>
                 </div>
-                <div class="stat-block">
-                    <div class="stat-label">Adresse de connexion</div>
-                    <div class="stat-value url">
-                        {{ server.url }}
-                        <button class="copy-btn" onclick="copyToClipboard('{{ server.url }}', this)">Copier</button>
-                    </div>
+                {% if server.memoryUsed is not null and server.memoryLimit > 0 %}
+                    {% set ramPct = min(100, server.memoryUsed / server.memoryLimit * 100) %}
+                    <span class="xp-bar{{ ramPct > 85 ? ' high' : '' }}" title="RAM utilisée : {{ ramPct|round }} %"><span style="width: {{ ramPct|round(1) }}%"></span></span>
+                {% endif %}
+                <div>
+                    <dt>Disque</dt>
+                    <dd>
+                        {%- if server.diskUsed is not null %}{{ (server.diskUsed / 1024)|round(1) }}{% if server.diskLimit > 0 %} / {{ (server.diskLimit / 1024)|round }}{% endif %} Go
+                        {%- elseif server.diskLimit > 0 %}{{ (server.diskLimit / 1024)|round }} Go
+                        {%- else %}—{% endif -%}
+                    </dd>
                 </div>
+                <div>
+                    <dt>Uptime</dt>
+                    <dd>{{ server.uptime ?? '—' }}</dd>
+                </div>
+                {% if server.java %}
+                <div>
+                    <dt>Java</dt>
+                    <dd>{{ server.java }}</dd>
+                </div>
+                {% endif %}
+                {% if mc %}
+                <div>
+                    <dt>Latence</dt>
+                    <dd>{{ mc.latency }} ms</dd>
+                </div>
+                {% endif %}
+            </dl>
+
+            <div class="server-meta">
+                <span class="egg" title="Type de serveur Pterodactyl (egg)">{{ server.egg != server.game ? server.egg }}</span>
+                {% if server.modpack and server.modpack.url %}
+                <a href="{{ server.modpack.url }}" target="_blank" rel="noopener noreferrer" class="curseforge-badge" title="Voir le modpack sur CurseForge">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.326 9.218L19.378 12H24L18.074 14.41L19.854 24H13.062L12 20.428L10.938 24H4.146L5.926 14.41L0 12H4.622L5.674 9.218H8.058L6.584 12.892L5.504 18.648H8.196L9.036 15.14H12.964L13.804 18.648H16.496L15.416 12.892L13.942 9.218H18.326ZM12 2.056L14.388 0L15.156 3.016L12 4.11L8.844 3.016L9.612 0L12 2.056Z"/>
+                    </svg>
+                    {% if server.modpack.isDirectLink %}Modpack{% else %}CurseForge{% endif %}
+                </a>
+                {% endif %}
             </div>
         </div>
         {% else %}
-        <div class="empty-state">
-            <div class="empty-state-icon">🎮</div>
-            <p class="empty-state-text">Aucun serveur disponible</p>
-        </div>
+        <div class="empty-state">Aucun serveur disponible</div>
         {% endfor %}
-    </div>
-
-    <!-- Info box -->
-    <div class="info-box">
-        <span class="info-icon">💡</span>
-        <p class="info-text">
-            <strong>Astuce :</strong> Clique sur le nom du serveur pour acceder au modpack sur CurseForge !
-        </p>
     </div>
 </div>
 
@@ -542,7 +483,7 @@
 function copyToClipboard(text, button) {
     navigator.clipboard.writeText(text).then(function() {
         const originalText = button.textContent;
-        button.textContent = 'Copie !';
+        button.textContent = 'Copié !';
         button.classList.add('copied');
         setTimeout(function() {
             button.textContent = originalText;

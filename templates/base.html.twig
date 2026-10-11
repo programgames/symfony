@@ -14,6 +14,11 @@
 <body>
 {% block body %}{% endblock %}
 
+{# Bouton de retour à l'accueil, présent sur toutes les pages sauf celles qui ont déjà la barre de navigation. #}
+{% block home_link %}
+    {% include '_home_link.html.twig' %}
+{% endblock %}
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 {% block javascripts %}{% endblock %}
 </body>

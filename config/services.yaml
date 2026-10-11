@@ -12,6 +12,7 @@ parameters:
     pterodactyl.application_api_url: '%env(PTERODACTYL_APPLICATION_API_URL)%'
     pterodactyl.client_api_url: '%env(PTERODACTYL_CLIENT_API_URL)%'
     wings.endpoint:  '%env(WINGS_CLIENT_API_URL)%'
+    wings.daemon_token: '%env(WINGS_DAEMON_TOKEN)%'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -33,6 +34,7 @@ services:
     App\Wings\WingsApiClient:
         arguments:
             $applicationApiUrl: '%wings.endpoint%'
+            $daemonToken: '%wings.daemon_token%'
 
     App\Service\CurseForgeService:
         arguments:

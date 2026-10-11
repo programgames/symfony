@@ -1,98 +1,16 @@
-{% extends 'base.html.twig' %}
+{% extends 'hub/_layout.html.twig' %}
 
-{% block title %}Accueil - GameHub{% endblock %}
+{% block hub_title %}Accueil{% endblock %}
 
-{% block stylesheets %}
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        min-height: 100vh;
-        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
-        font-family: 'Rajdhani', sans-serif;
-        overflow-x: hidden;
-    }
-
-    /* Animated background grid */
-    .bg-grid {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image:
-            linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
-        background-size: 50px 50px;
-        pointer-events: none;
-        z-index: 0;
-    }
-
-    /* Floating particles */
-    .particles {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 1;
-        overflow: hidden;
-    }
-
-    .particle {
-        position: absolute;
-        width: 4px;
-        height: 4px;
-        background: rgba(0, 255, 255, 0.6);
-        border-radius: 50%;
-        animation: float 15s infinite;
-        box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
-    }
-
-    @keyframes float {
-        0%, 100% {
-            transform: translateY(100vh) rotate(0deg);
-            opacity: 0;
-        }
-        10% { opacity: 1; }
-        90% { opacity: 1; }
-        100% {
-            transform: translateY(-100vh) rotate(720deg);
-            opacity: 0;
-        }
-    }
-
-    .main-container {
-        position: relative;
-        z-index: 10;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-    }
-
-    /* Header styling */
-    .header {
-        text-align: center;
-        margin-bottom: 4rem;
-    }
+{% block hub_styles %}
+    .hero { text-align: center; padding: 2.5rem 0 3rem; }
 
     .logo {
         font-family: 'Orbitron', sans-serif;
-        font-size: 4rem;
+        font-size: clamp(2.4rem, 9vw, 4.5rem);
         font-weight: 900;
         color: #fff;
-        text-transform: uppercase;
-        letter-spacing: 0.3em;
+        letter-spacing: 0.25em;
         text-shadow:
             0 0 10px rgba(0, 255, 255, 0.8),
             0 0 20px rgba(0, 255, 255, 0.6),
@@ -102,13 +20,6 @@
     }
 
     @keyframes pulse-glow {
-        from {
-            text-shadow:
-                0 0 10px rgba(0, 255, 255, 0.8),
-                0 0 20px rgba(0, 255, 255, 0.6),
-                0 0 40px rgba(0, 255, 255, 0.4),
-                0 0 80px rgba(0, 255, 255, 0.2);
-        }
         to {
             text-shadow:
                 0 0 15px rgba(0, 255, 255, 1),
@@ -119,233 +30,240 @@
     }
 
     .tagline {
-        font-size: 1.2rem;
-        color: rgba(255, 255, 255, 0.6);
-        letter-spacing: 0.5em;
-        margin-top: 1rem;
+        color: var(--muted);
+        letter-spacing: 0.35em;
         text-transform: uppercase;
+        margin-top: 0.8rem;
+        font-size: 1.05rem;
     }
 
-    /* Cards container */
-    .cards-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
-        max-width: 900px;
-        width: 100%;
+    .quick {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.6rem;
+        margin-top: 2rem;
     }
 
-    /* Card styling */
-    .game-card {
-        position: relative;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        padding: 2.5rem;
+    .quick a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        color: var(--text);
         text-decoration: none;
-        color: #fff;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        overflow: hidden;
-        backdrop-filter: blur(10px);
-    }
-
-    .game-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border-radius: 20px;
-        padding: 2px;
-        background: linear-gradient(135deg, var(--card-color), transparent 50%);
-        -webkit-mask:
-            linear-gradient(#fff 0 0) content-box,
-            linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        opacity: 0;
-        transition: opacity 0.4s ease;
-    }
-
-    .game-card:hover::before {
-        opacity: 1;
-    }
-
-    .game-card:hover {
-        transform: translateY(-10px) scale(1.02);
-        background: rgba(255, 255, 255, 0.08);
-        box-shadow:
-            0 20px 40px rgba(0, 0, 0, 0.4),
-            0 0 30px var(--card-glow);
-    }
-
-    .game-card.pokemon {
-        --card-color: #ffcc00;
-        --card-glow: rgba(255, 204, 0, 0.3);
-    }
-
-    .game-card.minecraft {
-        --card-color: #44ff44;
-        --card-glow: rgba(68, 255, 68, 0.3);
-    }
-
-    .card-icon {
-        width: 80px;
-        height: 80px;
-        margin-bottom: 1.5rem;
-        transition: transform 0.4s ease;
-    }
-
-    .game-card:hover .card-icon {
-        transform: scale(1.1) rotate(5deg);
-    }
-
-    .card-title {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 1.5rem;
         font-weight: 700;
-        margin-bottom: 0.75rem;
-        color: var(--card-color);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 0.45rem 1.1rem;
+        transition: border-color 0.2s, background 0.2s, transform 0.2s;
     }
 
-    .card-description {
-        font-size: 1rem;
-        color: rgba(255, 255, 255, 0.7);
-        line-height: 1.6;
+    .quick a:hover { border-color: var(--cyan); background: var(--surface-hover); transform: translateY(-2px); }
+
+    .hub-section { margin-top: 3rem; scroll-margin-top: 4.5rem; }
+
+    .section-head {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+        margin-bottom: 1.2rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.6rem;
     }
 
-    .card-arrow {
-        position: absolute;
-        bottom: 1.5rem;
-        right: 1.5rem;
-        width: 40px;
-        height: 40px;
-        border: 2px solid var(--card-color);
-        border-radius: 50%;
+    .section-head h2 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.35rem;
+        letter-spacing: 0.08em;
+        color: var(--section-color, var(--cyan));
+    }
+
+    .section-head p { color: var(--faint); font-size: 1rem; }
+
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.1rem;
+    }
+
+    .hub-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.4rem;
+        color: var(--text);
+        text-decoration: none;
+        backdrop-filter: blur(10px);
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .hub-card:hover {
+        transform: translateY(-6px);
+        background: var(--surface-hover);
+        border-color: var(--card-color);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35), 0 0 26px var(--card-glow);
+    }
+
+    .hub-card .icon {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        opacity: 0;
-        transform: translateX(-10px);
-        transition: all 0.3s ease;
+        font-size: 1.6rem;
+        background: color-mix(in srgb, var(--card-color) 16%, transparent);
+        border: 1px solid color-mix(in srgb, var(--card-color) 45%, transparent);
     }
 
-    .game-card:hover .card-arrow {
-        opacity: 1;
-        transform: translateX(0);
+    .hub-card h3 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.05rem;
+        color: var(--card-color);
+        margin-top: 0.3rem;
     }
 
-    .card-arrow svg {
-        width: 20px;
-        height: 20px;
-        fill: var(--card-color);
+    .hub-card p { color: var(--muted); font-size: 1.02rem; line-height: 1.45; flex: 1; }
+
+    .tag {
+        align-self: flex-start;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--faint);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 0.05rem 0.6rem;
     }
 
-    /* Footer */
-    .footer {
-        margin-top: 4rem;
-        text-align: center;
-        color: rgba(255, 255, 255, 0.3);
-        font-size: 0.9rem;
+    .hub-card.featured { grid-column: span 2; }
+
+    @media (max-width: 600px) {
+        .hub-card.featured { grid-column: auto; }
+        .section-head { flex-direction: column; gap: 0.1rem; }
     }
 
-    .footer span {
-        color: rgba(0, 255, 255, 0.6);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .logo {
-            font-size: 2.5rem;
-            letter-spacing: 0.15em;
-        }
-
-        .tagline {
-            font-size: 0.9rem;
-            letter-spacing: 0.3em;
-        }
-
-        .cards-container {
-            grid-template-columns: 1fr;
-        }
-
-        .game-card {
-            padding: 2rem;
-        }
-    }
-</style>
+    .c-yellow { --card-color: var(--yellow); --card-glow: rgba(255, 204, 0, 0.3); }
+    .c-green  { --card-color: var(--green);  --card-glow: rgba(68, 255, 136, 0.3); }
+    .c-purple { --card-color: var(--purple); --card-glow: rgba(179, 136, 255, 0.3); }
+    .c-blurple { --card-color: var(--blurple); --card-glow: rgba(114, 137, 255, 0.3); }
+    .c-pink   { --card-color: var(--pink);   --card-glow: rgba(255, 95, 162, 0.3); }
+    .c-orange { --card-color: var(--orange); --card-glow: rgba(255, 159, 67, 0.3); }
+    .c-cyan   { --card-color: var(--cyan);   --card-glow: var(--cyan-glow); }
 {% endblock %}
 
-{% block body %}
-<!-- Animated background -->
-<div class="bg-grid"></div>
-<div class="particles">
-    {% for i in 1..20 %}
-    <div class="particle" style="left: {{ random(0, 100) }}%; animation-delay: {{ random(0, 15) }}s; animation-duration: {{ random(10, 20) }}s;"></div>
-    {% endfor %}
-</div>
+{% block hub_content %}
+<header class="hero">
+    <h1 class="logo">GameHub</h1>
+    <p class="tagline">Jeux · Serveurs · Guides</p>
+    <div class="quick">
+        <a href="{{ path('pokemon_quiz_index') }}">🎵 Quiz Pokémon</a>
+        <a href="{{ path('servers') }}">⛏️ Serveurs Minecraft</a>
+        <a href="https://romm.multimod.ovh" target="_blank" rel="noopener">🕹️ RomM ↗</a>
+        <a href="{{ path('app_guide_bot_jeux') }}">🎲 Bot de jeux</a>
+        <a href="{{ path('app_guide_bot_musique') }}">🎧 Bot musique</a>
+    </div>
+</header>
 
-<div class="main-container">
-    <!-- Header -->
-    <header class="header">
-        <h1 class="logo">GameHub</h1>
-        <p class="tagline">Plateforme de jeux</p>
-    </header>
-
-    <!-- Cards -->
-    <div class="cards-container">
-        <!-- Pokemon Quiz Card -->
-        <a href="{{ path('pokemon_quiz_index') }}" class="game-card pokemon">
-            <svg class="card-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Pokeball -->
-                <circle cx="50" cy="50" r="45" stroke="#ffcc00" stroke-width="4" fill="none"/>
-                <path d="M5 50 H95" stroke="#ffcc00" stroke-width="4"/>
-                <circle cx="50" cy="50" r="15" stroke="#ffcc00" stroke-width="4" fill="#1a1a2e"/>
-                <circle cx="50" cy="50" r="8" fill="#ffcc00"/>
-                <!-- Top half fill -->
-                <path d="M50 5 A45 45 0 0 1 95 50 H65 A15 15 0 0 0 35 50 H5 A45 45 0 0 1 50 5" fill="rgba(255, 204, 0, 0.2)"/>
-            </svg>
-            <h2 class="card-title">Quiz Pokemon</h2>
-            <p class="card-description">
-                Teste tes connaissances sur les cris des Pokemon !
-                Mode solo ou multijoueur disponible.
-            </p>
-            <div class="card-arrow">
-                <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
-            </div>
+<section class="hub-section" id="jeux" style="--section-color: var(--yellow)">
+    <div class="section-head">
+        <h2>🎮 Jeux &amp; guides</h2>
+        <p>À jouer directement dans le navigateur</p>
+    </div>
+    <div class="card-grid">
+        <a href="{{ path('pokemon_quiz_index') }}" class="hub-card c-yellow featured">
+            <span class="icon">🎵</span>
+            <h3>Quiz Pokémon</h3>
+            <p>Reconnais les Pokémon à leur cri. Seul ou à plusieurs : crée une partie et partage le lien à tes amis.</p>
+            <span class="tag">Solo · Multijoueur</span>
         </a>
-
-        <!-- Minecraft Servers Card -->
-        <a href="{{ path('servers') }}" class="game-card minecraft">
-            <svg class="card-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Minecraft block style -->
-                <rect x="10" y="10" width="80" height="80" stroke="#44ff44" stroke-width="4" fill="rgba(68, 255, 68, 0.1)" rx="4"/>
-                <!-- Grid pattern -->
-                <line x1="10" y1="36" x2="90" y2="36" stroke="#44ff44" stroke-width="2" opacity="0.5"/>
-                <line x1="10" y1="63" x2="90" y2="63" stroke="#44ff44" stroke-width="2" opacity="0.5"/>
-                <line x1="36" y1="10" x2="36" y2="90" stroke="#44ff44" stroke-width="2" opacity="0.5"/>
-                <line x1="63" y1="10" x2="63" y2="90" stroke="#44ff44" stroke-width="2" opacity="0.5"/>
-                <!-- Center block highlight -->
-                <rect x="38" y="38" width="23" height="23" fill="#44ff44" opacity="0.3"/>
-                <!-- Pickaxe hint -->
-                <path d="M25 75 L45 55 L55 65 L35 85 Z" fill="#44ff44" opacity="0.6"/>
-                <circle cx="52" cy="48" r="8" stroke="#44ff44" stroke-width="2" fill="none"/>
-            </svg>
-            <h2 class="card-title">Serveurs Minecraft</h2>
-            <p class="card-description">
-                Consulte l'etat de nos serveurs Minecraft.
-                Rejoins la communaute et construis ton aventure !
-            </p>
-            <div class="card-arrow">
-                <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
-            </div>
+        <a href="{{ path('app_lol_augments') }}" class="hub-card c-orange">
+            <span class="icon">⚔️</span>
+            <h3>Optimisations LoL</h3>
+            <p>Toutes les optimisations (augments) de l'ARAM du chaos en français, y compris celles du PBE.</p>
+            <span class="tag">Guide</span>
         </a>
     </div>
+</section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <p>Propulse par <span>Symfony</span></p>
-    </footer>
-</div>
+<section class="hub-section" id="minecraft" style="--section-color: var(--green)">
+    <div class="section-head">
+        <h2>⛏️ Minecraft</h2>
+        <p>Nos serveurs moddés et de quoi bien y jouer</p>
+    </div>
+    <div class="card-grid">
+        <a href="{{ path('servers') }}" class="hub-card c-green featured">
+            <span class="icon">🟩</span>
+            <h3>Serveurs Minecraft</h3>
+            <p>L'état des serveurs en direct, leur adresse à copier et le modpack à installer pour chacun.</p>
+            <span class="tag">En direct</span>
+        </a>
+        <a href="/mods-guide.html" class="hub-card c-cyan">
+            <span class="icon">📦</span>
+            <h3>Guide des mods</h3>
+            <p>Les mods du pack DiscoverMC, ce qu'ils apportent et comment s'en servir.</p>
+            <span class="tag">Guide</span>
+        </a>
+        <a href="/PUZZLES-MEATBALLCRAFT-FR.html" class="hub-card c-purple">
+            <span class="icon">🧩</span>
+            <h3>Puzzles MeatballCraft</h3>
+            <p>Les solutions des puzzles cachés du modpack MeatballCraft.</p>
+            <span class="tag">Guide</span>
+        </a>
+        <a href="{{ path('app_bees') }}" class="hub-card c-yellow">
+            <span class="icon">🐝</span>
+            <h3>Bee Tracker</h3>
+            <p>Suis ton élevage d'abeilles : celles obtenues, celles qui manquent et ce que tu peux débloquer maintenant.</p>
+            <span class="tag">Outil</span>
+        </a>
+    </div>
+</section>
+
+<section class="hub-section" id="retro" style="--section-color: var(--purple)">
+    <div class="section-head">
+        <h2>🕹️ Rétro-gaming</h2>
+        <p>Les jeux des anciennes consoles, jouables dans le navigateur</p>
+    </div>
+    <div class="card-grid">
+        <a href="https://romm.multimod.ovh" target="_blank" rel="noopener" class="hub-card c-purple featured">
+            <span class="icon">👾</span>
+            <h3>RomM ↗</h3>
+            <p>La bibliothèque de jeux rétro : parcours les consoles et lance un jeu en un clic, sans rien installer.</p>
+            <span class="tag">Site externe</span>
+        </a>
+        <a href="{{ path('app_guide_romm') }}" class="hub-card c-cyan">
+            <span class="icon">📖</span>
+            <h3>Guide RomM</h3>
+            <p>Se connecter, trouver un jeu, y jouer et sauvegarder sa partie : tout expliqué pas à pas.</p>
+            <span class="tag">Guide</span>
+        </a>
+    </div>
+</section>
+
+<section class="hub-section" id="discord" style="--section-color: var(--blurple)">
+    <div class="section-head">
+        <h2>💬 Discord</h2>
+        <p>Les bots du serveur, expliqués simplement</p>
+    </div>
+    <div class="card-grid">
+        <a href="{{ path('app_guide_bot_jeux') }}" class="hub-card c-blurple">
+            <span class="icon">🎲</span>
+            <h3>Bot de mini-jeux</h3>
+            <p>Blind tests LoL, Pokémon, musiques de jeux, génériques et Pokédle du jour : comment lancer une partie et jouer.</p>
+            <span class="tag">Guide</span>
+        </a>
+        <a href="{{ path('app_guide_bot_musique') }}" class="hub-card c-pink">
+            <span class="icon">🎧</span>
+            <h3>Bot musique</h3>
+            <p>Écouter de la musique ensemble en vocal : lancer un titre, gérer la file, pause et volume.</p>
+            <span class="tag">Guide</span>
+        </a>
+    </div>
+</section>
 {% endblock %}

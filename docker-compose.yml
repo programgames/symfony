@@ -1,6 +1,7 @@
 services:
 
     php:
+        restart: unless-stopped
         build: ./docker/php
         networks:
             - web
@@ -10,6 +11,7 @@ services:
             DATABASE_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?serverVersion=16&charset=utf8"
 
     nginx:
+        restart: unless-stopped
         build: ./docker/nginx
         volumes:
             - ./:/var/www/symfony
@@ -23,8 +25,17 @@ services:
             - "traefik.http.services.nginx.loadbalancer.server.port=80"
             - "traefik.http.routers.nginx.tls=true"
             - "traefik.http.routers.nginx.tls.certresolver=default"
+            # /docs/ (documentation privée, ex. mediatheque.html) : réservé aux comptes Authelia 2FA
+            - "traefik.http.routers.nginx-docs.rule=Host(`minecraft.multimod.ovh`) && PathPrefix(`/docs`)"
+            - "traefik.http.routers.nginx-docs.entrypoints=websecure"
+            - "traefik.http.routers.nginx-docs.tls=true"
+            - "traefik.http.routers.nginx-docs.tls.certresolver=default"
+            - "traefik.http.routers.nginx-docs.middlewares=authelia-auth@docker,noindex@file"
+            - "traefik.http.routers.nginx-docs.service=nginx"
+            - "traefik.http.routers.nginx.service=nginx"
             - "traefik.docker.network=web"
     db:
+        restart: unless-stopped
         image: postgres:16-alpine
         environment:
             POSTGRES_DB: ${DB_NAME}
@@ -42,3 +53,9 @@ networks:
     web:
         external: true
 
+
+# Tag de regroupement dans Arcane (sans effet sur les conteneurs)
+x-arcane:
+  tags:
+    - name: docs
+      color: gray

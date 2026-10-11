@@ -1,0 +1,30 @@
+{# Bouton flottant « Accueil ». Le même code est copié dans les pages HTML statiques de public/ (sans Twig). #}
+<a href="{{ path('app_home') }}" class="gh-home-link" title="Retour à l'accueil GameHub">
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z"/></svg>
+    <span>Accueil</span>
+</a>
+<style>
+    .gh-home-link {
+        position: fixed;
+        left: 16px;
+        bottom: 16px;
+        z-index: 900;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 0.95rem;
+        border-radius: 999px;
+        background: rgba(10, 10, 26, 0.88);
+        border: 1px solid rgba(34, 229, 255, 0.55);
+        color: #f1f5f9;
+        font: 600 15px/1 system-ui, -apple-system, 'Segoe UI', sans-serif;
+        text-decoration: none;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 12px rgba(34, 229, 255, 0.25);
+        backdrop-filter: blur(8px);
+        transition: transform 0.2s, background 0.2s;
+    }
+
+    .gh-home-link:hover { color: #fff; background: rgba(34, 229, 255, 0.2); transform: translateY(-2px); }
+
+    @media print { .gh-home-link { display: none; } }
+</style>

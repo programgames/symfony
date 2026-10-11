@@ -25,3 +25,23 @@
 ###< symfony/asset-mapper ###
 
 node_modules/
+
+###> Homelab ###
+# Documentation interne (servie derrière Authelia) : jamais publiée
+/public/docs/
+# Secrets, sauvegardes locales et artefacts
+.env.*
+!.env.example
+!.env.prod
+!.env.test
+*.env.save*
+*.bak-*
+cookies.txt
+*.sqlite*
+.venv/
+__pycache__/
+dist/
+# Dossiers de données d'exécution ; /data/ à la racine = données statiques de l'app, suivies
+data/
+!/data/
+###< Homelab ###

@@ -1,0 +1,225 @@
+{% extends 'hub/_layout.html.twig' %}
+
+{% block hub_title %}Guide RomM{% endblock %}
+
+{% block hub_styles %}
+    body { --accent: var(--purple); --accent-glow: rgba(179, 136, 255, 0.4); }
+
+    .login-box {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 0.6rem 1rem;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid color-mix(in srgb, var(--purple) 50%, transparent);
+        border-radius: 14px;
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+    }
+
+    .login-box dt { color: var(--muted); font-weight: 600; }
+    .login-box dd { font-family: ui-monospace, Consolas, monospace; font-size: 1.1rem; color: #fff; word-break: break-all; }
+
+    .copy {
+        font: inherit;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--text);
+        background: var(--surface-hover);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.15rem 0.7rem;
+        cursor: pointer;
+    }
+
+    .copy:hover { border-color: var(--purple); }
+
+    .platforms { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0 1rem; }
+
+    .platforms span {
+        font-weight: 600;
+        border-radius: 999px;
+        padding: 0.1rem 0.75rem;
+        border: 1px solid var(--border);
+        background: var(--surface);
+    }
+
+    .platforms.play span { border-color: color-mix(in srgb, var(--green) 50%, transparent); }
+
+    .keys { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.4rem 1rem; margin: 0.8rem 0; }
+    .keys div { display: flex; justify-content: space-between; gap: 0.6rem; border-bottom: 1px dashed var(--border); padding: 0.2rem 0; }
+{% endblock %}
+
+{% block hub_content %}
+<header class="page-hero">
+    <span class="eyebrow">Rétro-gaming · Guide</span>
+    <h1>🕹️ Jouer aux jeux rétro avec RomM</h1>
+    <p>Des milliers de jeux Nintendo et PlayStation, jouables directement dans ton navigateur. Rien à installer : un clic sur « Jouer » et c'est parti.</p>
+    <div class="actions">
+        <a class="hub-btn" href="https://romm.multimod.ovh" target="_blank" rel="noopener">Ouvrir RomM ↗</a>
+    </div>
+</header>
+
+<div class="guide">
+    <nav class="toc">
+        <a href="#connexion">Se connecter</a>
+        <a href="#trouver">Trouver un jeu</a>
+        <a href="#jouer">Jouer</a>
+        <a href="#sauvegarder">Sauvegarder</a>
+        <a href="#commandes">Commandes</a>
+        <a href="#plus">Bonus</a>
+        <a href="#faq">Problèmes</a>
+    </nav>
+
+    <section class="panel" id="connexion">
+        <h2><span class="num">1</span> Se connecter</h2>
+        <p>Va sur <a href="https://romm.multimod.ovh" target="_blank" rel="noopener">romm.multimod.ovh</a> et connecte-toi avec le <strong>compte invité</strong>, commun à tout le monde :</p>
+        {% if guest_username and guest_password %}
+            <dl class="login-box">
+                <dt>Nom d'utilisateur</dt>
+                <dd id="guest-user">{{ guest_username }}</dd>
+                <button class="copy" type="button" data-copy="guest-user">Copier</button>
+                <dt>Mot de passe</dt>
+                <dd id="guest-pass">{{ guest_password }}</dd>
+                <button class="copy" type="button" data-copy="guest-pass">Copier</button>
+            </dl>
+        {% else %}
+            <div class="callout warn">
+                🔑 Les identifiants du compte invité ne sont pas encore affichés ici : demande-les sur le serveur Discord.
+            </div>
+        {% endif %}
+        <p>Remplis <span class="ui">Nom d'utilisateur</span> et <span class="ui">Mot de passe</span>, puis clique sur <span class="ui">Se connecter</span>.</p>
+        <div class="callout warn">
+            ⚠️ <strong>Ce compte est partagé.</strong> Ne change pas son mot de passe ni son nom dans <span class="ui">Profil</span> : tous les autres joueurs seraient bloqués dehors.
+        </div>
+    </section>
+
+    <section class="panel" id="trouver">
+        <h2><span class="num">2</span> Trouver un jeu</h2>
+        <ul>
+            <li><strong>Accueil</strong> : les jeux <span class="ui">Ajouté récemment</span>, tes <span class="ui">Favoris</span> et un <span class="ui">Choix aléatoire</span> si tu ne sais pas quoi lancer.</li>
+            <li><strong>Plateformes</strong> : choisis une console pour voir tous ses jeux.</li>
+            <li><strong>Rechercher</strong> : tape le nom du jeu (par exemple « zelda » ou « pokemon »).</li>
+            <li><strong>Collections</strong> : des sélections de jeux toutes prêtes.</li>
+        </ul>
+        <p>Clique sur une jaquette pour ouvrir la page du jeu : résumé, captures d'écran et les boutons <span class="ui">Jouer</span> et <span class="ui">Télécharger</span>.</p>
+        <h3>Consoles jouables dans le navigateur</h3>
+        <div class="platforms play">
+            <span>NES</span><span>Famicom Disk System</span><span>Super Nintendo</span><span>Game Boy</span><span>Game Boy Color</span>
+            <span>Game Boy Advance</span><span>Nintendo 64</span><span>Nintendo DS</span><span>Nintendo DSi</span><span>PlayStation</span>
+        </div>
+        <h3>À télécharger seulement</h3>
+        <p>Ces consoles sont trop récentes pour le navigateur : télécharge le jeu et ouvre-le avec un émulateur sur ton ordinateur.</p>
+        <div class="platforms">
+            <span>3DS</span><span>Wii</span><span>Wii U</span><span>Switch</span><span>64DD</span><span>Pokémon mini</span>
+        </div>
+    </section>
+
+    <section class="panel" id="jouer">
+        <h2><span class="num">3</span> Jouer</h2>
+        <ol>
+            <li>Sur la page du jeu, clique sur <span class="ui">Jouer</span>.</li>
+            <li>Si une partie existe déjà, RomM propose de reprendre depuis une sauvegarde ou un état. Sinon, le jeu démarre du début.</li>
+            <li>Clique sur <span class="ui">Plein écran</span> pour un meilleur confort.</li>
+        </ol>
+        <div class="callout tip">
+            🎮 <strong>Avec une manette</strong> (Xbox, PlayStation, Switch…) : branche-la, puis appuie sur un de ses boutons pour que le navigateur la détecte. Elle marche alors toute seule.
+        </div>
+        <div class="callout">
+            📱 <strong>Sur téléphone ou tablette</strong>, une manette tactile s'affiche à l'écran. Les jeux N64, DS et PlayStation peuvent être lents sur un appareil peu puissant.
+        </div>
+    </section>
+
+    <section class="panel" id="sauvegarder">
+        <h2><span class="num">4</span> Sauvegarder sa partie</h2>
+        <p>Tes progrès sont enregistrés <strong>sur le serveur</strong> : tu peux reprendre sur un autre ordinateur ou ton téléphone.</p>
+        <ul>
+            <li><strong>Sauvegarde du jeu</strong> : sauvegarde normalement dans le jeu (au point de sauvegarde, dans le menu…). RomM l'envoie tout seul au serveur.</li>
+            <li><strong>État</strong> : une photo de l'instant présent, possible à tout moment. Utilise <span class="ui">Sauvegarder l'état</span> puis plus tard <span class="ui">Charger l'état</span>, ou les touches <kbd>1</kbd> et <kbd>2</kbd>.</li>
+            <li><strong>Pour quitter</strong>, choisis <span class="ui">Sauvegarder et quitter</span>. Astuce : maintiens <strong>Select + Start</strong> un instant pour ouvrir le menu de sortie.</li>
+        </ul>
+        <p>Pour reprendre, relance le jeu avec <span class="ui">Jouer</span> et choisis <span class="ui">Reprendre depuis un état</span> ou <span class="ui">Reprendre depuis une sauvegarde</span>. Les onglets <span class="ui">Sauvegardes</span> et <span class="ui">États</span> de la page du jeu les listent.</p>
+        <div class="callout warn">
+            👥 Comme le compte est partagé, <strong>les sauvegardes aussi</strong> : tout le monde voit les mêmes. Ne supprime pas celles des autres, et fais attention à ne pas écraser la partie de quelqu'un d'autre.
+        </div>
+    </section>
+
+    <section class="panel" id="commandes">
+        <h2><span class="num">5</span> Les touches du clavier</h2>
+        <p>Les touches par défaut :</p>
+        <div class="keys">
+            <div><kbd>← ↑ → ↓</kbd><span>Croix directionnelle</span></div>
+            <div><kbd>Entrée</kbd><span>Start</span></div>
+            <div><kbd>V</kbd><span>Select</span></div>
+            <div><kbd>Z</kbd><span>A</span></div>
+            <div><kbd>X</kbd><span>B</span></div>
+            <div><kbd>A</kbd><span>X</span></div>
+            <div><kbd>S</kbd><span>Y</span></div>
+            <div><kbd>Q / E</kbd><span>L / R</span></div>
+            <div><kbd>Tab / R</kbd><span>L2 / R2</span></div>
+            <div><kbd>T F G H</kbd><span>Stick gauche</span></div>
+            <div><kbd>1</kbd><span>Sauvegarde rapide</span></div>
+            <div><kbd>2</kbd><span>Chargement rapide</span></div>
+        </div>
+        <div class="callout">
+            ⌨️ Ces touches sont prévues pour un clavier anglais (QWERTY). Sur un clavier français, certaines peuvent ne pas tomber au bon endroit : change-les dans <span class="ui">Paramètres des commandes</span>, dans le menu du jeu.
+        </div>
+    </section>
+
+    <section class="panel" id="plus">
+        <h2><span class="num">6</span> Pour aller plus loin</h2>
+        <ul>
+            <li><strong>Favoris</strong> : sur la page d'un jeu, <span class="ui">Ajouter aux favoris</span> pour le retrouver sur l'accueil.</li>
+            <li><strong>Mode console</strong> : une interface plein écran pensée pour la télé et la manette. Ouvre <a href="https://romm.multimod.ovh/console" target="_blank" rel="noopener">romm.multimod.ovh/console</a>. Pour quitter un jeu : <strong>Start + Select</strong>.</li>
+            <li><strong>Télécharger</strong> : le bouton <span class="ui">Télécharger</span> récupère le fichier du jeu, pour y jouer avec un émulateur ou sur une vraie console modifiée.</li>
+            <li><strong>Statut</strong> : <span class="ui">Définir le statut</span> (« En train de jouer », « Terminé »…) pour suivre où tu en es.</li>
+        </ul>
+    </section>
+
+    <section class="panel" id="faq">
+        <h2>🛟 Un problème ?</h2>
+        <details class="faq">
+            <summary>« Échec de la connexion »</summary>
+            Vérifie le nom d'utilisateur et le mot de passe : ils sont sensibles aux majuscules. Utilise les boutons « Copier » plus haut pour éviter les fautes. Si ça ne marche toujours pas, préviens-nous sur Discord : quelqu'un a peut-être changé le mot de passe.
+        </details>
+        <details class="faq">
+            <summary>Il n'y a pas de bouton « Jouer »</summary>
+            Cette console n'est pas jouable dans le navigateur (3DS, Wii, Switch…). Utilise <span class="ui">Télécharger</span> et un émulateur sur ton ordinateur.
+        </details>
+        <details class="faq">
+            <summary>Ma manette ne répond pas</summary>
+            Clique une fois sur l'écran du jeu, puis appuie sur un bouton de la manette. Si elle ne marche toujours pas, débranche-la, rebranche-la et recharge la page.
+        </details>
+        <details class="faq">
+            <summary>Le jeu rame ou le son grésille</summary>
+            Ferme les autres onglets, et préfère un ordinateur pour la N64, la DS et la PlayStation.
+        </details>
+        <details class="faq">
+            <summary>Ma sauvegarde a disparu</summary>
+            Regarde les onglets <span class="ui">Sauvegardes</span> et <span class="ui">États</span> de la page du jeu. Si l'envoi au serveur a échoué, RomM garde la sauvegarde dans ton navigateur et réessaie plus tard : rouvre le jeu sur le même ordinateur.
+        </details>
+    </section>
+
+    <div class="actions">
+        <a class="hub-btn" href="https://romm.multimod.ovh" target="_blank" rel="noopener">Ouvrir RomM ↗</a>
+        <a class="hub-btn ghost" href="{{ path('app_home') }}">← Retour à l'accueil</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block hub_scripts %}
+<script>
+    document.querySelectorAll('[data-copy]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const text = document.getElementById(button.dataset.copy).textContent.trim();
+            try {
+                await navigator.clipboard.writeText(text);
+                button.textContent = 'Copié ✓';
+            } catch (e) {
+                button.textContent = 'Échec';
+            }
+            setTimeout(() => { button.textContent = 'Copier'; }, 1500);
+        });
+    });
+</script>
+{% endblock %}

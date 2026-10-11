@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ARAM du chaos/Optimisations · GameHub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Spectral:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reprise de la charte du League of Legends Wiki (habillage Vector sombre). */
+        :root {
+            --league-wiki-blue: #061f36;
+            --league-wiki-blue-lighter: #152b3f;
+            --league-wiki-dark: #060e1f;
+            --league-black: #010a13;
+            --league-blue: #091428;
+            --league-white: #ebddc1;
+            --league-grey-1: #a09b8c;
+            --league-wheat-gold: #c8aa6e;
+            --league-gold: #c89b3c;
+            --league-dark-gold: #463714;
+            --table-header: #2b3241;
+            --table-border: #3e4451;
+            --sidebar-w: 176px;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            background: var(--league-black);
+            color: var(--league-white);
+            font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        a, .lk { color: var(--league-wheat-gold); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* En-tête */
+        .wiki-header {
+            position: relative;
+            height: 80px;
+            margin-left: var(--sidebar-w);
+            background:
+                linear-gradient(180deg, rgba(1, 10, 19, 0.15), rgba(1, 10, 19, 0.75)),
+                radial-gradient(ellipse at 30% 0%, #1b4a6e 0%, transparent 60%),
+                radial-gradient(ellipse at 75% 20%, #0f3a5a 0%, transparent 55%),
+                linear-gradient(90deg, #0a2236, #0d2c47 50%, #071a2c);
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .tabs { display: flex; align-self: flex-end; height: 40px; }
+
+        .tabs span {
+            display: flex;
+            align-items: center;
+            padding: 0 0.6rem;
+            font-size: 0.8rem;
+            background: var(--league-black);
+            color: var(--league-white);
+        }
+
+        .tabs span + span { background: rgba(1, 10, 19, 0.75); color: var(--league-wheat-gold); }
+
+        .search {
+            display: flex;
+            align-items: center;
+            height: 40px;
+            background: var(--league-wiki-blue-lighter);
+            width: min(260px, 50vw);
+        }
+
+        .search input {
+            flex: 1;
+            height: 100%;
+            min-width: 0;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: var(--league-white);
+            font: inherit;
+            font-size: 0.85rem;
+            padding: 0 0.6rem;
+        }
+
+        .search input::placeholder { color: var(--league-white); opacity: 0.85; }
+        .search svg { margin: 0 0.6rem; flex: none; color: var(--league-grey-1); }
+
+        /* Barre latérale */
+        .sidebar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-w);
+            padding: 1.2rem 0.95rem;
+        }
+
+        .logo {
+            display: block;
+            text-align: center;
+            font-family: 'Spectral', Georgia, serif;
+            font-weight: 700;
+            font-size: 1.45rem;
+            line-height: 1.05;
+            color: var(--league-gold);
+            text-shadow: 0 2px 0 #000, 0 0 18px rgba(200, 155, 60, 0.35);
+            letter-spacing: 0.04em;
+            margin-bottom: 1.4rem;
+        }
+
+        .logo small { display: block; font-size: 0.62rem; letter-spacing: 0.3em; color: var(--league-white); }
+        .logo:hover { text-decoration: none; }
+
+        .portal h3 { font-size: 0.75rem; font-weight: 700; color: var(--league-white); margin: 1.2rem 0 0.4rem; }
+
+        .portal ul {
+            list-style: none;
+            margin: 0;
+            padding: 0.45rem 0.55rem;
+            border: 1px solid #1e2328;
+            background: #000912;
+        }
+
+        .portal li { font-size: 0.72rem; line-height: 1.75; }
+
+        /* Contenu */
+        .content {
+            margin-left: var(--sidebar-w);
+            background: var(--league-wiki-blue);
+            padding: 1rem 2.4rem 2.5rem;
+            min-height: calc(100vh - 80px);
+            box-shadow: 0 0 7px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            font-family: 'Spectral', Georgia, serif;
+            font-weight: 700;
+            font-size: 2rem;
+            line-height: 1.3;
+            margin: 0.4rem 0 0.25rem;
+            padding-bottom: 0.15rem;
+            border-bottom: 1px solid var(--league-dark-gold);
+        }
+
+        h2 {
+            font-family: 'Spectral', Georgia, serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 1.6rem 0 0.6rem;
+            border-bottom: 1px solid var(--league-dark-gold);
+            scroll-margin-top: 1rem;
+        }
+
+        .subpages { font-size: 0.8rem; margin-bottom: 1.2rem; }
+
+        p { margin: 0.5rem 0 0.9rem; }
+
+        .toc {
+            display: inline-block;
+            background: var(--league-black);
+            border: 1px solid #1e2328;
+            font-size: 0.9em;
+            margin: 0.3rem 0 1rem;
+            box-shadow: 0 0.25rem 0.35rem -0.25rem rgba(0, 0, 0, 0.1);
+        }
+
+        .toc .toctitle { background: var(--league-blue); padding: 0.25em 1em; font-weight: 700; }
+        .toc .toctitle small { font-weight: 400; color: var(--league-white); margin-left: 0.3rem; }
+        .toc ul { list-style: none; margin: 0; padding: 0.75em 1.75em; line-height: 1.8em; }
+        .toc .num { color: var(--league-white); margin-right: 0.35em; }
+
+        .table-scroll { overflow-x: auto; }
+
+        table.wikitable {
+            border-collapse: collapse;
+            background: var(--league-wiki-dark);
+            color: var(--league-white);
+            border: 1px solid var(--table-border);
+            margin: 0.6rem 0 1rem;
+            max-width: 1060px;
+            width: 100%;
+        }
+
+        table.wikitable > tbody > tr > th,
+        table.wikitable > tbody > tr > td,
+        table.wikitable > thead > tr > th {
+            border: 1px solid var(--table-border);
+            padding: 0.35em 0.45em;
+        }
+
+        table.wikitable > thead > tr > th {
+            background: var(--table-header);
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        th.sortable { cursor: pointer; padding-right: 1.3em !important; position: relative; user-select: none; }
+
+        th.sortable::after {
+            content: '';
+            position: absolute;
+            right: 0.45em;
+            top: 50%;
+            margin-top: -6px;
+            border: 4px solid transparent;
+            border-bottom-color: var(--league-white);
+            box-shadow: 0 0 0 0 transparent;
+            height: 0;
+            filter: drop-shadow(0 7px 0 var(--league-white));
+            opacity: 0.8;
+        }
+
+        th.sortable.asc::after { filter: none; margin-top: -2px; }
+        th.sortable.desc::after { filter: none; border-bottom-color: transparent; border-top-color: var(--league-white); margin-top: -2px; }
+
+        td.aug { text-align: center; width: 120px; vertical-align: middle; }
+        td.aug img { display: block; margin: 0 auto 0.15rem; width: 80px; height: 80px; object-fit: contain; }
+        td.aug .en { display: block; font-size: 0.72rem; color: var(--league-grey-1); }
+        td.effect { line-height: 1.65; }
+        td.effect img { vertical-align: text-bottom; }
+        td.tier { text-align: center; width: 120px; }
+
+        .pp { border-bottom: 1px dotted; cursor: help; }
+        .gl { white-space: normal; }
+        .disabled-note { color: #e34d4c; font-weight: 700; }
+
+        .tag-pbe {
+            display: inline-block;
+            margin-top: 0.25rem;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: #010a13;
+            background: var(--league-gold);
+            border-radius: 3px;
+            padding: 0 0.35rem;
+        }
+
+        .placeholder-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 0.15rem;
+            border-radius: 50%;
+            border: 2px dashed var(--table-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--league-grey-1);
+        }
+
+        /* Petits tableaux imbriqués du wiki (temps de recharge, quêtes…) */
+        td.effect table { border-collapse: collapse; margin: 0.5rem 0; width: 100%; }
+        td.effect table th, td.effect table td { border-bottom: 1px solid var(--table-border); padding: 0.3em 0.5em; text-align: center; }
+        td.effect table th { background: var(--league-blue); }
+        td.effect table td:first-child { background: rgba(255, 255, 255, 0.02); }
+
+        .no-results { display: none; font-style: italic; color: var(--league-grey-1); }
+
+        ul.notes { padding-left: 1.4rem; }
+        ul.notes li { margin: 0.3rem 0; }
+
+        .credits {
+            margin-left: var(--sidebar-w);
+            padding: 1.2rem 2.4rem 4.5rem;
+            font-size: 0.75rem;
+            color: var(--league-white);
+        }
+
+        @media (max-width: 800px) {
+            :root { --sidebar-w: 0px; }
+            .sidebar { display: none; }
+            .wiki-header { height: 56px; }
+            .tabs { display: none; }
+            .search { width: 100%; }
+            .content { padding: 0.8rem 1rem 2rem; }
+            .credits { padding: 1rem 1rem 4.5rem; }
+            h1 { font-size: 1.6rem; }
+            /* Sur mobile, chaque ligne devient une carte : icône et rang en haut, effet en dessous. */
+            table.wikitable > thead { display: none; }
+            table.wikitable, table.wikitable > tbody { display: block; border: 0; }
+            table.wikitable > tbody > tr {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                border: 1px solid var(--table-border);
+                margin-bottom: 0.6rem;
+            }
+            table.wikitable > tbody > tr[hidden] { display: none; }
+            table.wikitable > tbody > tr > td { border: 0; }
+            td.aug { width: auto; display: flex; align-items: center; gap: 0.6rem; text-align: left; flex-wrap: wrap; }
+            td.aug img, .placeholder-icon { width: 48px; height: 48px; margin: 0; }
+            td.aug .en { width: 100%; }
+            td.tier { width: auto; align-self: center; font-weight: 700; color: var(--league-wheat-gold); }
+            td.effect { grid-column: 1 / -1; border-top: 1px solid var(--table-border) !important; }
+        }
+    </style>
+</head>
+<body>
+<header class="wiki-header">
+    <nav class="tabs" aria-label="Onglets">
+        <span>Page</span>
+        <span>{{ live|length + pbe|length }} optimisations</span>
+    </nav>
+    <label class="search">
+        <input type="search" id="search" placeholder="Rechercher une optimisation" autocomplete="off" aria-label="Rechercher une optimisation">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"/></svg>
+    </label>
+</header>
+
+<aside class="sidebar">
+    <a class="logo" href="{{ path('app_home') }}">GameHub<small>WIKI</small></a>
+    <div class="portal">
+        <h3>Navigation</h3>
+        <ul>
+            <li><a href="{{ path('app_home') }}">Accueil</a></li>
+            <li><a href="{{ path('pokemon_quiz_index') }}">Quiz Pokémon</a></li>
+            <li><a href="{{ path('servers') }}">Serveurs Minecraft</a></li>
+        </ul>
+    </div>
+    <div class="portal">
+        <h3>League of Legends</h3>
+        <ul>
+            <li><a href="#actuelles">Optimisations actuelles</a></li>
+            <li><a href="#pbe">Optimisations du PBE</a></li>
+            <li><a href="#notes">Notes</a></li>
+        </ul>
+    </div>
+    <div class="portal">
+        <h3>Discord</h3>
+        <ul>
+            <li><a href="{{ path('app_guide_bot_jeux') }}">Bot de mini-jeux</a></li>
+            <li><a href="{{ path('app_guide_bot_musique') }}">Bot musique</a></li>
+        </ul>
+    </div>
+</aside>
+
+<main class="content">
+    <h1>ARAM du chaos/Optimisations</h1>
+    <div class="subpages">&lt; <a href="{{ path('app_home') }}">Accueil GameHub</a></div>
+
+    <p>Cette liste regroupe toutes les optimisations du mode de jeu ARAM du chaos, traduites en français.</p>
+    <p>Les optimisations actuelles viennent du <a href="https://wiki.leagueoflegends.com/en-us/ARAM:_Mayhem/Augments" target="_blank" rel="noopener">League of Legends Wiki</a> (mis à jour le {{ wiki_date }}), avec les noms officiels du client français. Celles du <b>PBE</b> (serveur de test) sont listées à part : leurs valeurs peuvent encore changer avant leur sortie.</p>
+
+    <div class="toc">
+        <div class="toctitle">Sommaire</div>
+        <ul>
+            <li><a href="#actuelles"><span class="num">1</span>Optimisations actuelles</a></li>
+            <li><a href="#pbe"><span class="num">2</span>Optimisations du PBE</a></li>
+            <li><a href="#notes"><span class="num">3</span>Notes</a></li>
+            <li><a href="#anecdotes"><span class="num">4</span>Anecdotes</a></li>
+        </ul>
+    </div>
+
+    {% for section in [
+        {id: 'actuelles', title: 'Optimisations actuelles', rows: live, pbe: false},
+        {id: 'pbe', title: 'Optimisations du PBE', rows: pbe, pbe: true}
+    ] %}
+        <h2 id="{{ section.id }}">{{ section.title }}</h2>
+        {% if section.pbe %}
+            <p>Optimisations présentes uniquement sur le PBE. Les valeurs chiffrées ne sont pas encore connues : seuls les effets sont décrits.</p>
+        {% endif %}
+        <div class="table-scroll">
+            <table class="wikitable sortable-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-key="name" style="width:120px;">Optimisation</th>
+                        <th class="sortable" data-key="effect">Effet</th>
+                        <th class="sortable" data-key="tier" style="width:120px;">Rang</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in section.rows %}
+                        <tr data-name="{{ a.name_fr }}" data-tier="{{ a.tier_rank }}" data-search="{{ (a.name_fr ~ ' ' ~ a.name_en ~ ' ' ~ a.effect_text)|lower }}">
+                            <td class="aug" id="{{ a.slug }}">
+                                {% if a.icon %}
+                                    <img src="/images/lol-mayhem/{{ a.icon }}" alt="" loading="lazy" width="80" height="80">
+                                {% else %}
+                                    <div class="placeholder-icon">?</div>
+                                {% endif %}
+                                {{ a.name_fr }}
+                                {% if a.name_en != a.name_fr %}<span class="en">{{ a.name_en }}</span>{% endif %}
+                                {% if section.pbe %}<span class="tag-pbe">PBE</span>{% endif %}
+                            </td>
+                            <td class="effect">
+                                {{ a.effect_fr|raw }}
+                                {% if a.disabled %}<br><br><span class="disabled-note">Cette optimisation est actuellement désactivée.</span>{% endif %}
+                            </td>
+                            <td class="tier">{{ a.tier_fr }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="no-results">Aucune optimisation ne correspond à la recherche.</p>
+    {% endfor %}
+
+    <h2 id="notes">Notes</h2>
+    <ul class="notes">
+        {% for n in notes %}<li>{{ n|raw }}</li>{% endfor %}
+    </ul>
+
+    <h2 id="anecdotes">Anecdotes</h2>
+    <ul class="notes">
+        {% for n in trivia %}<li>{{ n|raw }}</li>{% endfor %}
+    </ul>
+</main>
+
+<footer class="credits">
+    Textes traduits et adaptés du <a href="https://wiki.leagueoflegends.com/en-us/ARAM:_Mayhem/Augments" target="_blank" rel="noopener">League of Legends Wiki</a> (licence CC BY-SA 3.0). Noms officiels et données du PBE : client du jeu via CommunityDragon. League of Legends est une marque de Riot Games ; ce site n'est pas affilié à Riot Games.
+</footer>
+
+{% include '_home_link.html.twig' %}
+
+<script>
+    (() => {
+        const tables = [...document.querySelectorAll('.sortable-table')];
+
+        // Tri par colonne, comme les tableaux « sortable » du wiki.
+        tables.forEach((table) => {
+            const tbody = table.tBodies[0];
+            table.querySelectorAll('th.sortable').forEach((th, index) => {
+                th.addEventListener('click', () => {
+                    const asc = !th.classList.contains('asc');
+                    table.querySelectorAll('th.sortable').forEach((h) => h.classList.remove('asc', 'desc'));
+                    th.classList.add(asc ? 'asc' : 'desc');
+                    const key = th.dataset.key;
+                    const value = (row) => key === 'tier'
+                        ? Number(row.dataset.tier)
+                        : (key === 'name' ? row.dataset.name : row.cells[index].textContent.trim());
+                    const rows = [...tbody.rows].sort((a, b) => {
+                        const va = value(a), vb = value(b);
+                        const cmp = typeof va === 'number' ? va - vb : va.localeCompare(vb, 'fr', { sensitivity: 'base' });
+                        return asc ? cmp : -cmp;
+                    });
+                    tbody.append(...rows);
+                });
+            });
+        });
+
+        // Recherche depuis la barre du haut : filtre les deux tableaux.
+        const search = document.getElementById('search');
+        const normalize = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+        search.addEventListener('input', () => {
+            const q = normalize(search.value.trim());
+            tables.forEach((table) => {
+                let visible = 0;
+                [...table.tBodies[0].rows].forEach((row) => {
+                    const show = !q || normalize(row.dataset.search).includes(q);
+                    row.hidden = !show;
+                    visible += show;
+                });
+                table.closest('.table-scroll').nextElementSibling.style.display = visible ? 'none' : 'block';
+            });
+        });
+    })();
+</script>
+</body>
+</html>

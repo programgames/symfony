@@ -1,0 +1,162 @@
+{% extends 'hub/_layout.html.twig' %}
+
+{% block hub_title %}Guide du bot de mini-jeux{% endblock %}
+
+{% block hub_styles %}
+    body { --accent: var(--blurple); --accent-glow: rgba(114, 137, 255, 0.4); }
+{% endblock %}
+
+{% block hub_content %}
+<header class="page-hero">
+    <span class="eyebrow">Discord · Guide</span>
+    <h1>🎲 Le bot de mini-jeux</h1>
+    <p>Blind tests, devinettes et défi Pokémon du jour, à plusieurs sur le serveur Discord. Pas besoin de compte ni de réglage : il suffit de taper une commande.</p>
+</header>
+
+<div class="guide">
+    <nav class="toc">
+        <a href="#demarrer">Démarrer</a>
+        <a href="#repondre">Répondre</a>
+        <a href="#jeux">Les jeux</a>
+        <a href="#pokedle">Pokédle</a>
+        <a href="#duel">Duel &amp; classement</a>
+        <a href="#options">Options</a>
+        <a href="#faq">Problèmes</a>
+    </nav>
+
+    <section class="panel" id="demarrer">
+        <h2><span class="num">1</span> Lancer une partie en 30 secondes</h2>
+        <ol>
+            <li>Va dans le salon <strong>#bot</strong>. Les commandes ne marchent que là (et dans ses fils).</li>
+            <li>Tape <code>/</code> puis le nom du jeu, par exemple <code>/pokemon</code>, et choisis <code>jouer</code>. Appuie sur <kbd>Entrée</kbd>.</li>
+            <li>Une <strong>salle d'attente</strong> s'ouvre. Chacun clique sur <span class="ui">✅ Je joue</span> pour s'inscrire (celui qui lance est déjà inscrit).</li>
+            <li>Quand tout le monde est prêt, n'importe quel joueur clique sur <span class="ui">▶️ Lancer</span>.</li>
+        </ol>
+        <div class="callout tip">
+            🔊 <strong>Conseil :</strong> rejoins un salon vocal <em>avant</em> de lancer. Le bot vient y jouer les sons. Si personne n'est en vocal, les sons sont envoyés en fichier dans le chat.
+        </div>
+        <p>Pas lancée au bout de <strong>2 minutes</strong>, la salle d'attente se ferme toute seule. Tu arrives en retard ? Clique sur <span class="ui">🙋 Rejoindre</span> pendant la partie.</p>
+    </section>
+
+    <section class="panel" id="repondre">
+        <h2><span class="num">2</span> Répondre et marquer des points</h2>
+        <p>À chaque manche, le bot fait écouter un son ou affiche une image. Pour répondre :</p>
+        <ul>
+            <li>Clique sur <span class="ui">✍️ Répondre</span> : une petite fenêtre s'ouvre, tape ton nom et valide. Personne ne voit ta réponse.</li>
+            <li>Une <strong>faute de frappe</strong> est tolérée pour les noms de 5 lettres ou plus.</li>
+            <li>Tu as <strong>30 secondes</strong> par manche, et autant d'essais que tu veux.</li>
+        </ul>
+        <p>Les plus rapides gagnent le plus : <strong>3 points</strong> pour le premier, <strong>2</strong> pour le deuxième, puis <strong>1</strong> pour tous les suivants. Petit bonus ⚡ si le premier trouve en moins de 5 secondes, et 🔥 pour une série de 3 manches gagnées.</p>
+        <div class="table-wrap">
+            <table class="cmds">
+                <tr><th>Bouton</th><th>À quoi il sert</th></tr>
+                <tr><td><span class="ui">🔁 Réécouter</span></td><td>Rejouer le son (seulement si le bot est en vocal).</td></tr>
+                <tr><td><span class="ui">⏭️ Passer</span></td><td>Personne ne trouve ? On passe à la manche suivante.</td></tr>
+                <tr><td><span class="ui">⏹️ Arrêter</span></td><td>Arrêter la partie (celui qui l'a lancée, ou un admin). Même chose que <code>/stop</code>.</td></tr>
+            </table>
+        </div>
+        <p>Une partie dure <strong>5 manches</strong> par défaut. À chaque fin de manche, le bot montre la réponse et le top 3.</p>
+    </section>
+
+    <section class="panel" id="jeux">
+        <h2><span class="num">3</span> Les jeux</h2>
+        <p>Chaque jeu a sa commande. Ajoute toujours <code>jouer</code> pour lancer une partie normale.</p>
+        <div class="table-wrap">
+            <table class="cmds">
+                <tr><th>Commande</th><th>Le jeu</th></tr>
+                <tr><td><code>/lol-voix</code></td><td>Quel champion de League of Legends parle ? (voix françaises)</td></tr>
+                <tr><td><code>/lol-replique</code></td><td>Une réplique s'affiche : quel champion la dit ?</td></tr>
+                <tr><td><code>/pokemon</code></td><td>Qui est ce Pokémon ? Devine-le d'après sa silhouette.</td></tr>
+                <tr><td><code>/jv-ost</code></td><td>Blind test de musiques de jeux vidéo (environ 170 jeux).</td></tr>
+                <tr><td><code>/jv-console</code></td><td>Reconnais la console à son son de démarrage.</td></tr>
+                <tr><td><code>/generiques</code></td><td>Blind test des génériques français de dessins animés.</td></tr>
+                <tr><td><code>/pokedle</code></td><td>Le Pokémon mystère du jour (voir plus bas).</td></tr>
+                <tr><td><code>/aide</code></td><td>La liste de tous les jeux.</td></tr>
+                <tr><td><code>/stop</code></td><td>Arrêter la partie en cours.</td></tr>
+            </table>
+        </div>
+        <div class="callout">
+            ℹ️ <strong>Une seule partie à la fois</strong> sur tout le serveur. Si le bot répond « Une partie est déjà en cours », attends qu'elle se termine ou rejoins-la.
+        </div>
+        <p>Les règles d'un jeu en détail : <code>/pokemon aide</code>, <code>/lol-voix aide</code>… (toi seul vois la réponse).</p>
+    </section>
+
+    <section class="panel" id="pokedle">
+        <h2><span class="num">4</span> Pokédle : le défi du jour</h2>
+        <p>Chaque jour, un <strong>Pokémon mystère</strong> (générations 1 à 4), le même pour tout le monde. Il change à <strong>minuit</strong>.</p>
+        <ol>
+            <li>Tape <code>/pokedle essai</code> et commence à écrire un nom : le bot propose des suggestions.</li>
+            <li>Le bot compare ton Pokémon au mystère : types, génération, stade d'évolution, couleur, forme, taille et poids.
+                <br>🟩 identique · 🟨 type présent mais à l'autre place · 🟥 différent · ⬆️⬇️ la bonne valeur est plus grande ou plus petite.</li>
+            <li>Recommence jusqu'à trouver ! Essais illimités, et personne ne voit tes propositions.</li>
+        </ol>
+        <p>Coincé ? Des indices arrivent tout seuls : la catégorie au 6ᵉ essai, la silhouette au 10ᵉ, la première lettre au 14ᵉ.</p>
+        <p>Trouvé ? Clique sur <span class="ui">📣 Partager mon résultat</span> pour montrer ta grille de couleurs sans dévoiler le nom. <code>/pokedle grille</code> réaffiche ta grille et <code>/pokedle stats</code> montre ta série de jours.</p>
+    </section>
+
+    <section class="panel" id="duel">
+        <h2><span class="num">5</span> Duel, classement et stats</h2>
+        <div class="table-wrap">
+            <table class="cmds">
+                <tr><th>Commande</th><th>Ce qu'elle fait</th></tr>
+                <tr><td><code>/pokemon duel</code></td><td>Défie quelqu'un en 1 contre 1 : choisis ton adversaire dans la liste.</td></tr>
+                <tr><td><code>/pokemon classement</code></td><td>Le classement du jeu, général ou de la semaine (depuis lundi).</td></tr>
+                <tr><td><code>/pokemon stats</code></td><td>Tes points, ta précision, ton temps moyen et ton record (ou ceux d'un autre joueur).</td></tr>
+            </table>
+        </div>
+        <p>Ça marche pareil pour tous les jeux : remplace <code>/pokemon</code> par <code>/jv-ost</code>, <code>/lol-voix</code>, etc.</p>
+    </section>
+
+    <section class="panel" id="options">
+        <h2><span class="num">6</span> Pour aller plus loin : les options</h2>
+        <p>Après <code>jouer</code>, Discord propose des options facultatives. Sans rien choisir, les réglages par défaut conviennent très bien.</p>
+        <div class="table-wrap">
+            <table class="cmds">
+                <tr><th>Option</th><th>Effet</th><th>Par défaut</th></tr>
+                <tr><td><code>manches</code></td><td>Nombre de manches (1 à 30).</td><td>5</td></tr>
+                <tr><td><code>objectif</code></td><td>Le premier à atteindre ce score gagne (remplace les manches).</td><td>—</td></tr>
+                <tr><td><code>duree</code></td><td>Secondes par manche (10 à 90).</td><td>30</td></tr>
+                <tr><td><code>mode</code></td><td><code>tous</code> : chacun répond en privé. <code>premier</code> : on écrit dans le chat, le premier qui trouve gagne la manche.</td><td>tous</td></tr>
+                <tr><td><code>reponse</code></td><td><code>qcm</code> : 4 boutons au choix, un seul clic par manche.</td><td>chat</td></tr>
+                <tr><td><code>tolerance</code></td><td><code>stricte</code> : le nom doit être exact.</td><td>normale</td></tr>
+                <tr><td><code>essais</code></td><td>Essais par manche : 1, 3 ou illimité.</td><td>illimité</td></tr>
+                <tr><td><code>rejouer</code></td><td>Nombre de « Réécouter » par manche.</td><td>illimité</td></tr>
+                <tr><td><code>bonus</code></td><td>Bonus de rapidité et de série.</td><td>oui</td></tr>
+            </table>
+        </div>
+        <p>Certains jeux ont leurs propres options : générations pour <code>/pokemon</code>, époque pour <code>/jv-ost</code> et <code>/generiques</code>, difficulté pour <code>/lol-voix</code>… Elles sont décrites dans <code>/&lt;jeu&gt; aide</code>.</p>
+        <div class="callout tip">
+            🎯 <strong>Idée de partie rapide entre amis :</strong> <code>/jv-ost jouer reponse:qcm manches:10</code>, parfait pour les débutants.
+        </div>
+    </section>
+
+    <section class="panel" id="faq">
+        <h2>🛟 Un problème ?</h2>
+        <details class="faq">
+            <summary>Le bot me dit de relancer ma commande dans #bot</summary>
+            Les commandes ne marchent que dans le salon <strong>#bot</strong>. Va dans ce salon et tape de nouveau ta commande.
+        </details>
+        <details class="faq">
+            <summary>Je n'entends rien</summary>
+            Rejoins un salon vocal <em>avant</em> de lancer la partie. Sinon, le son arrive sous forme de fichier dans le chat : clique dessus pour l'écouter.
+        </details>
+        <details class="faq">
+            <summary>« Une partie est déjà en cours »</summary>
+            Une seule partie peut tourner à la fois sur le serveur. Attends la fin, ou demande à celui qui l'a lancée de l'arrêter avec <code>/stop</code>.
+        </details>
+        <details class="faq">
+            <summary>Je vois deux commandes <code>/stop</code></summary>
+            Le bot musique en a une aussi. Dans la liste de Discord, le nom du bot est affiché à côté de chaque commande : choisis celle du bot de jeux.
+        </details>
+        <details class="faq">
+            <summary>« Cette manche est terminée »</summary>
+            Tu as cliqué sur un bouton d'une manche déjà finie. Utilise les boutons du dernier message du bot.
+        </details>
+    </section>
+
+    <div class="actions">
+        <a class="hub-btn ghost" href="{{ path('app_guide_bot_musique') }}">🎧 Guide du bot musique</a>
+        <a class="hub-btn" href="{{ path('app_home') }}">← Retour à l'accueil</a>
+    </div>
+</div>
+{% endblock %}

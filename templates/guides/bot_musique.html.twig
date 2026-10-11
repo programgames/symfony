@@ -1,0 +1,126 @@
+{% extends 'hub/_layout.html.twig' %}
+
+{% block hub_title %}Guide du bot musique{% endblock %}
+
+{% block hub_styles %}
+    body { --accent: var(--pink); --accent-glow: rgba(255, 95, 162, 0.4); }
+{% endblock %}
+
+{% block hub_content %}
+<header class="page-hero">
+    <span class="eyebrow">Discord · Guide</span>
+    <h1>🎧 Le bot musique</h1>
+    <p>Écoutez de la musique ensemble dans un salon vocal. Une seule commande à retenir : <code>/play</code>.</p>
+</header>
+
+<div class="guide">
+    <nav class="toc">
+        <a href="#demarrer">Démarrer</a>
+        <a href="#recherche">Quoi écouter</a>
+        <a href="#controles">Contrôler</a>
+        <a href="#file">La file d'attente</a>
+        <a href="#faq">Problèmes</a>
+    </nav>
+
+    <section class="panel" id="demarrer">
+        <h2><span class="num">1</span> Lancer la musique</h2>
+        <ol>
+            <li><strong>Rejoins un salon vocal.</strong> C'est obligatoire : le bot vient jouer là où tu es.</li>
+            <li>Va dans le salon texte <strong>#bot</strong> : c'est le seul où le bot accepte les commandes.</li>
+            <li>Tape <code>/play</code> puis le nom d'une chanson, par exemple <code>/play daft punk one more time</code>.</li>
+            <li>Choisis un résultat dans les suggestions (ou appuie directement sur <kbd>Entrée</kbd>) : la musique démarre !</li>
+        </ol>
+        <div class="callout tip">
+            ➕ Un titre est déjà en cours ? <code>/play</code> ajoute le nouveau <strong>à la fin de la file</strong>. Pour qu'il passe juste après, utilise <code>/playnext</code>.
+        </div>
+    </section>
+
+    <section class="panel" id="recherche">
+        <h2><span class="num">2</span> Ce qu'on peut donner à <code>/play</code></h2>
+        <ul>
+            <li><strong>Du texte</strong> : le bot cherche sur YouTube. Dès 3 lettres, il propose jusqu'à 10 résultats avec leur durée.</li>
+            <li><strong>Un lien YouTube</strong> : une vidéo, ou une <strong>playlist entière</strong> (100 titres maximum).</li>
+            <li><strong>Un lien SoundCloud, Bandcamp, Twitch ou Vimeo.</strong></li>
+        </ul>
+        <div class="callout warn">
+            ⚠️ <strong>Les liens Spotify ne marchent pas.</strong> Tape plutôt le titre et l'artiste : le bot le trouvera sur YouTube.
+        </div>
+    </section>
+
+    <section class="panel" id="controles">
+        <h2><span class="num">3</span> Contrôler la lecture</h2>
+        <p>À chaque titre, le bot publie une <strong>carte « En cours »</strong> avec la pochette, la durée et qui l'a demandé. Ses boutons suffisent pour l'essentiel :</p>
+        <div class="table-wrap">
+            <table class="cmds">
+                <tr><th>Bouton</th><th>Effet</th></tr>
+                <tr><td><span class="ui">⏸️</span> / <span class="ui">▶️</span></td><td>Pause / reprendre</td></tr>
+                <tr><td><span class="ui">⏭️</span></td><td>Passer au titre suivant</td></tr>
+                <tr><td><span class="ui">⏹️</span></td><td>Tout arrêter : vide la file et le bot quitte le vocal</td></tr>
+                <tr><td><span class="ui">🔁</span></td><td>Boucle : désactivée → répéter le titre → répéter toute la file</td></tr>
+                <tr><td><span class="ui">🔀</span></td><td>Mélanger la file</td></tr>
+            </table>
+        </div>
+        <p>Les mêmes actions existent en commandes :</p>
+        <div class="table-wrap">
+            <table class="cmds">
+                <tr><th>Commande</th><th>Effet</th></tr>
+                <tr><td><code>/pause</code> · <code>/resume</code></td><td>Mettre en pause · reprendre</td></tr>
+                <tr><td><code>/skip</code></td><td>Passer le titre (option <code>count</code> pour en passer plusieurs)</td></tr>
+                <tr><td><code>/stop</code></td><td>Tout arrêter et faire partir le bot</td></tr>
+                <tr><td><code>/volume</code></td><td>Régler le volume de 0 à 150 % (100 % par défaut)</td></tr>
+                <tr><td><code>/seek</code></td><td>Aller à un moment du titre : <code>90</code>, <code>1:30</code> ou <code>1m30s</code></td></tr>
+                <tr><td><code>/loop</code></td><td>Choisir la boucle : désactivée, piste ou file</td></tr>
+                <tr><td><code>/nowplaying</code></td><td>Revoir le titre en cours (toi seul le vois)</td></tr>
+            </table>
+        </div>
+        <div class="callout">
+            ℹ️ Pour piloter le bot, il faut être <strong>dans le même salon vocal que lui</strong>. Il n'y a pas de vote : chaque personne présente peut passer ou arrêter.
+        </div>
+    </section>
+
+    <section class="panel" id="file">
+        <h2><span class="num">4</span> Gérer la file d'attente</h2>
+        <div class="table-wrap">
+            <table class="cmds">
+                <tr><th>Commande</th><th>Effet</th></tr>
+                <tr><td><code>/queue</code></td><td>Voir la file (10 titres par page, option <code>page</code> pour la suite)</td></tr>
+                <tr><td><code>/remove</code></td><td>Retirer un titre : donne sa <code>position</code> dans la file</td></tr>
+                <tr><td><code>/move</code></td><td>Déplacer un titre : de la position <code>from</code> à la position <code>to</code></td></tr>
+                <tr><td><code>/shuffle</code></td><td>Mélanger la file</td></tr>
+                <tr><td><code>/clear</code></td><td>Vider la file (le titre en cours continue)</td></tr>
+            </table>
+        </div>
+        <p>Les positions se lisent dans <code>/queue</code> : la position <strong>1</strong> est le prochain titre, pas celui en cours.</p>
+        <p>Le bot part tout seul après <strong>3 minutes</strong> quand la file est terminée ou que tout le monde a quitté le vocal. Refais simplement <code>/play</code> pour le faire revenir.</p>
+    </section>
+
+    <section class="panel" id="faq">
+        <h2>🛟 Un problème ?</h2>
+        <details class="faq">
+            <summary>« Rejoins d'abord un salon vocal »</summary>
+            Connecte-toi à un salon vocal, puis relance <code>/play</code>.
+        </details>
+        <details class="faq">
+            <summary>« Je suis déjà dans #… : rejoins-moi pour me piloter »</summary>
+            Le bot joue déjà dans un autre salon vocal. Rejoins-le là-bas, ou attends qu'il ait fini.
+        </details>
+        <details class="faq">
+            <summary>Le bot me dit de relancer ma commande dans #bot</summary>
+            Les commandes ne marchent que dans le salon <strong>#bot</strong>. Va dans ce salon et tape de nouveau ta commande.
+        </details>
+        <details class="faq">
+            <summary>« Impossible de lire… je passe au suivant »</summary>
+            Ce titre est bloqué ou indisponible. Essaie une autre version (live, clip, audio…) avec <code>/play</code>.
+        </details>
+        <details class="faq">
+            <summary>Je vois deux commandes <code>/stop</code></summary>
+            Le bot de mini-jeux en a une aussi. Dans la liste de Discord, le nom du bot est affiché à côté de chaque commande : choisis celle du bot musique.
+        </details>
+    </section>
+
+    <div class="actions">
+        <a class="hub-btn ghost" href="{{ path('app_guide_bot_jeux') }}">🎲 Guide du bot de jeux</a>
+        <a class="hub-btn" href="{{ path('app_home') }}">← Retour à l'accueil</a>
+    </div>
+</div>
+{% endblock %}

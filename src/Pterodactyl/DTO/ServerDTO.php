@@ -23,6 +23,8 @@ readonly class ServerDTO
         public ServerContainerDTO $container,
         public \DateTimeImmutable $updatedAt,
         public \DateTimeImmutable $createdAt,
+        public ?string $eggName = null,
+        public ?string $nestName = null,
     ) {
     }
 
@@ -49,6 +51,9 @@ readonly class ServerDTO
             container: ServerContainerDTO::fromArray($attributes['container']),
             updatedAt: new \DateTimeImmutable($attributes['updated_at']),
             createdAt: new \DateTimeImmutable($attributes['created_at']),
+            // Présents seulement avec ?include=egg,nest
+            eggName: $attributes['relationships']['egg']['attributes']['name'] ?? null,
+            nestName: $attributes['relationships']['nest']['attributes']['name'] ?? null,
         );
     }
 }

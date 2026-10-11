@@ -50,6 +50,14 @@ services:
             - "traefik.http.services.nginx.loadbalancer.server.port=80"
             - "traefik.http.routers.nginx.tls=true"
             - "traefik.http.routers.nginx.tls.certresolver=default"
+            # /docs/ (documentation privée, ex. mediatheque.html) : réservé aux comptes Authelia 2FA
+            - "traefik.http.routers.nginx-docs.rule=Host(`minecraft.multimod.ovh`) && PathPrefix(`/docs`)"
+            - "traefik.http.routers.nginx-docs.entrypoints=websecure"
+            - "traefik.http.routers.nginx-docs.tls=true"
+            - "traefik.http.routers.nginx-docs.tls.certresolver=default"
+            - "traefik.http.routers.nginx-docs.middlewares=authelia-auth@docker,noindex@file"
+            - "traefik.http.routers.nginx-docs.service=nginx"
+            - "traefik.http.routers.nginx.service=nginx"
             - "traefik.docker.network=web"
         deploy:
             resources:
